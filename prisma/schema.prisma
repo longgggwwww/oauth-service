@@ -1,0 +1,245 @@
+// schema.prisma
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id             String    @id @default(uuid())
+    email          String    @unique
+    password_hash  String?
+    username       String?   @unique
+    email_verified Boolean   @default(false)
+    mfa_enabled    Boolean   @default(false)
+    mfa_secret     String?
+    last_login_at  DateTime?
+    created_at     DateTime  @default(now())
+    updated_at     DateTime  @updatedAt
+    active         Boolean   @default(true)
+
+    // Relations
+    clients             Client[]
+    authorization_codes AuthorizationCode[]
+    access_tokens       AccessToken[]
+    refresh_tokens      RefreshToken[]
+    user_consents       UserConsent[]
+    profile             UserProfile?
+    mfa_devices         MfaDevice[]
+    passkeys            Passkey[]
+    backup_codes        BackupCode[]
+    auth_sessions       AuthSession[]
+
+    @@map("users")
+}
+
+model Client {
+    id            String   @id @default(uuid())
+    name          String
+    description   String?
+    client_id     String   @unique
+    client_secret String
+    redirect_uris Json // Array of redirect URIs
+    grant_types   Json // Array of grant types
+    scope         Json? // Array of scopes
+    website_url   String?
+    logo_url      String?
+    contacts      Json? // Array of contact emails
+    auto_approve  Boolean  @default(false)
+    created_at    DateTime @default(now())
+    updated_at    DateTime @updatedAt
+
+    // Relations
+    user_id             String
+    user                User                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    authorization_codes AuthorizationCode[]
+    access_tokens       AccessToken[]
+    refresh_tokens      RefreshToken[]
+    user_consents       UserConsent[]
+    client_scopes       ClientScope[]
+    auth_sessions       AuthSession[]
+
+    @@map("clients")
+}
+
+model AuthorizationCode {
+    id                    String   @id @default(uuid())
+    code                  String
+    client_id             String
+    user_id               String
+    redirect_uri          String?
+    scope                 Json?
+    code_challenge        String?
+    code_challenge_method String?
+    expires_at            DateTime
+    created_at            DateTime @default(now())
+
+    // Relations
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@unique([code])
+    @@index([expires_at])
+    @@map("authorization_codes")
+}
+
+model AccessToken {
+    id         String   @id @default(uuid())
+    token      String
+    client_id  String
+    user_id    String
+    scope      Json?
+    expires_at DateTime
+    created_at DateTime @default(now())
+    revoked    Boolean  @default(false)
+
+    // Relations
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@index([expires_at])
+    @@map("access_tokens")
+}
+
+model RefreshToken {
+    id         String   @id @default(uuid())
+    token      String
+    client_id  String
+    user_id    String
+    scope      Json?
+    expires_at DateTime
+    created_at DateTime @default(now())
+    revoked    Boolean  @default(false)
+
+    // Relations
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@index([expires_at])
+    @@map("refresh_tokens")
+}
+
+model UserConsent {
+    id         String    @id @default(uuid())
+    user_id    String
+    client_id  String
+    scope      Json?
+    granted_at DateTime  @default(now())
+    expires_at DateTime?
+
+    // Relations
+    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+
+    @@unique([user_id, client_id])
+    @@map("user_consents")
+}
+
+model UserProfile {
+    id          String   @id @default(uuid())
+    user_id     String   @unique
+    given_name  String?
+    family_name String?
+    picture     String?
+    locale      String?  @default("en")
+    timezone    String?
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    // Relations
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@map("user_profiles")
+}
+
+model MfaDevice {
+    id           String    @id @default(uuid())
+    user_id      String
+    name         String
+    type         String // "totp", "sms", "email", "webauthn"
+    secret       String?
+    backup_codes Json?
+    verified     Boolean   @default(false)
+    last_used_at DateTime?
+    created_at   DateTime  @default(now())
+    updated_at   DateTime  @updatedAt
+
+    // Relations
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@index([user_id, type])
+    @@map("mfa_devices")
+}
+
+model Passkey {
+    id            String    @id @default(uuid())
+    user_id       String
+    credential_id String    @unique
+    public_key    String
+    transports    String?
+    counter       Int
+    device_type   String?
+    backed_up     Boolean?
+    last_used_at  DateTime?
+    created_at    DateTime  @default(now())
+    updated_at    DateTime  @updatedAt
+
+    // Relations
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@index([user_id])
+    @@map("passkeys")
+}
+
+model BackupCode {
+    id         String    @id @default(uuid())
+    user_id    String
+    code_hash  String
+    used       Boolean   @default(false)
+    created_at DateTime  @default(now())
+    used_at    DateTime?
+
+    // Relations
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+    @@index([user_id, used])
+    @@map("backup_codes")
+}
+
+model ClientScope {
+    id          String  @id @default(uuid())
+    client_id   String
+    scope       String
+    description String?
+
+    // Relations
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+
+    @@unique([client_id, scope])
+    @@map("client_scopes")
+}
+
+model AuthSession {
+    id            String   @id @default(uuid())
+    user_id       String
+    client_id     String
+    session_token String   @unique
+    state         Json?
+    ip_address    String?
+    user_agent    String?
+    expires_at    DateTime
+    created_at    DateTime @default(now())
+
+    // Relations
+    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
+
+    @@index([expires_at])
+    @@index([session_token])
+    @@map("auth_sessions")
+}
