@@ -1,1 +1,3 @@
-export interface TokenRepositoryPort {}
+export interface TokenRepositoryPort {
+  revokeAllClientTokens(clientId: string): Promise<void>;
+}
