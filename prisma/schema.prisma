@@ -1,25 +1,33 @@
-// schema.prisma
 generator client {
     provider = "prisma-client-js"
 }
 
 datasource db {
     provider = "postgresql"
-    url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+    PENDING
 }
 
 model User {
-    id             String    @id @default(uuid())
-    email          String    @unique
-    password_hash  String?
-    username       String?   @unique
-    email_verified Boolean   @default(false)
-    mfa_enabled    Boolean   @default(false)
-    mfa_secret     String?
-    last_login_at  DateTime?
-    created_at     DateTime  @default(now())
-    updated_at     DateTime  @updatedAt
-    active         Boolean   @default(true)
+    id                    String     @id @default(uuid())
+    email                 String     @unique
+    phone_number          String?    @unique
+    password_hash         String?
+    username              String?    @unique
+    email_verified        Boolean    @default(false)
+    phone_number_verified Boolean    @default(false)
+    status                UserStatus @default(ACTIVE)
+    mfa_enabled           Boolean    @default(false)
+    mfa_secret            String?
+    last_login_at         DateTime?
+    created_at            DateTime   @default(now())
+    updated_at            DateTime   @updatedAt
+    active                Boolean    @default(true) // Deprecated, use status
 
     // Relations
     clients             Client[]
@@ -141,15 +149,17 @@ model UserConsent {
 }
 
 model UserProfile {
-    id          String   @id @default(uuid())
-    user_id     String   @unique
+    id          String    @id @default(uuid())
+    user_id     String    @unique
     given_name  String?
     family_name String?
     picture     String?
-    locale      String?  @default("en")
+    avatar_url  String?
+    locale      String?   @default("en")
     timezone    String?
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
+    birth_date  DateTime?
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
 
     // Relations
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -163,9 +173,11 @@ model MfaDevice {
     name         String
     type         String // "totp", "sms", "email", "webauthn"
     secret       String?
+    phone_number String?
     backup_codes Json?
     verified     Boolean   @default(false)
     last_used_at DateTime?
+    last_sent_at DateTime?
     created_at   DateTime  @default(now())
     updated_at   DateTime  @updatedAt
 
@@ -177,17 +189,19 @@ model MfaDevice {
 }
 
 model Passkey {
-    id            String    @id @default(uuid())
-    user_id       String
-    credential_id String    @unique
-    public_key    String
-    transports    String?
-    counter       Int
-    device_type   String?
-    backed_up     Boolean?
-    last_used_at  DateTime?
-    created_at    DateTime  @default(now())
-    updated_at    DateTime  @updatedAt
+    id               String    @id @default(uuid())
+    user_id          String
+    credential_id    String    @unique
+    public_key       String
+    transports       String?
+    counter          Int
+    attestation_type String?
+    aaguid           String?
+    device_type      String?
+    backed_up        Boolean?
+    last_used_at     DateTime?
+    created_at       DateTime  @default(now())
+    updated_at       DateTime  @updatedAt
 
     // Relations
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -224,16 +238,28 @@ model ClientScope {
     @@map("client_scopes")
 }
 
+model Scope {
+    id          String   @id @default(uuid())
+    name        String   @unique
+    description String?
+    is_system   Boolean  @default(false)
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    @@map("scopes")
+}
+
 model AuthSession {
-    id            String   @id @default(uuid())
-    user_id       String
-    client_id     String
-    session_token String   @unique
-    state         Json?
-    ip_address    String?
-    user_agent    String?
-    expires_at    DateTime
-    created_at    DateTime @default(now())
+    id               String   @id @default(uuid())
+    user_id          String
+    client_id        String
+    session_token    String   @unique
+    state            Json?
+    ip_address       String?
+    user_agent       String?
+    expires_at       DateTime
+    is_mfa_completed Boolean  @default(false)
+    created_at       DateTime @default(now())
 
     // Relations
     user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)

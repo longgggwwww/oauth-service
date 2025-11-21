@@ -1,10 +1,16 @@
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDING');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "phone_number" TEXT,
     "password_hash" TEXT,
     "username" TEXT,
     "email_verified" BOOLEAN NOT NULL DEFAULT false,
+    "phone_number_verified" BOOLEAN NOT NULL DEFAULT false,
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "mfa_enabled" BOOLEAN NOT NULL DEFAULT false,
     "mfa_secret" TEXT,
     "last_login_at" TIMESTAMP(3),
@@ -99,8 +105,10 @@ CREATE TABLE "user_profiles" (
     "given_name" TEXT,
     "family_name" TEXT,
     "picture" TEXT,
+    "avatar_url" TEXT,
     "locale" TEXT DEFAULT 'en',
     "timezone" TEXT,
+    "birth_date" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -114,9 +122,11 @@ CREATE TABLE "mfa_devices" (
     "name" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "secret" TEXT,
+    "phone_number" TEXT,
     "backup_codes" JSONB,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "last_used_at" TIMESTAMP(3),
+    "last_sent_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -131,6 +141,8 @@ CREATE TABLE "passkeys" (
     "public_key" TEXT NOT NULL,
     "transports" TEXT,
     "counter" INTEGER NOT NULL,
+    "attestation_type" TEXT,
+    "aaguid" TEXT,
     "device_type" TEXT,
     "backed_up" BOOLEAN,
     "last_used_at" TIMESTAMP(3),
@@ -163,6 +175,18 @@ CREATE TABLE "client_scopes" (
 );
 
 -- CreateTable
+CREATE TABLE "scopes" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "is_system" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "scopes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "auth_sessions" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -172,6 +196,7 @@ CREATE TABLE "auth_sessions" (
     "ip_address" TEXT,
     "user_agent" TEXT,
     "expires_at" TIMESTAMP(3) NOT NULL,
+    "is_mfa_completed" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "auth_sessions_pkey" PRIMARY KEY ("id")
@@ -179,6 +204,9 @@ CREATE TABLE "auth_sessions" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_phone_number_key" ON "users"("phone_number");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
@@ -224,6 +252,9 @@ CREATE INDEX "backup_codes_user_id_used_idx" ON "backup_codes"("user_id", "used"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "client_scopes_client_id_scope_key" ON "client_scopes"("client_id", "scope");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "scopes_name_key" ON "scopes"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "auth_sessions_session_token_key" ON "auth_sessions"("session_token");
