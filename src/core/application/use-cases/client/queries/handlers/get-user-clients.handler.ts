@@ -2,8 +2,8 @@
 import { Inject } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetUserClientsQuery } from '../get-user-clients.query';
-import type { ClientRepositoryPort } from '../../../../ports/repositories/client-repository.port';
-import type { ClientSummary } from '../../../../../shared/types';
+import type { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
+import type { ClientSummary } from '@src/core/shared/types';
 
 @QueryHandler(GetUserClientsQuery)
 export class GetUserClientsHandler

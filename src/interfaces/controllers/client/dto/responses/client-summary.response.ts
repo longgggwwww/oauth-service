@@ -1,5 +1,5 @@
 // src/interfaces/controllers/client/dto/responses/client-summary.response.ts
-import { ClientSummary } from '../../../../../core/shared/types';
+import { ClientSummary } from '@src/core/shared/types';
 
 export class ClientSummaryResponse {
   id: string;

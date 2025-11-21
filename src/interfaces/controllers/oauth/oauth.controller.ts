@@ -1,13 +1,13 @@
 import { Controller, Post, Get, Body, Query, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ClientAppEntity } from '../../../core/domain/entities/client.entity';
+import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
 import { AuthorizeRequest } from './dto/requests/authorize.request';
 import { TokenRequest } from './dto/requests/token.request';
 import { RevokeTokenRequest } from './dto/requests/revoke-token.request';
-import { AuthorizeCommand } from '../../../core/application/use-cases/oauth/commands/authorize.command';
-import { ExchangeTokenCommand } from '../../../core/application/use-cases/oauth/commands/exchange-token.command';
-import { RevokeTokenCommand } from '../../../core/application/use-cases/oauth/commands/revoke-token.command';
-import { GetUserInfoQuery } from '../../../core/application/use-cases/oauth/queries/get-user-info.query';
+import { AuthorizeCommand } from '@src/core/application/use-cases/oauth/commands/authorize.command';
+import { ExchangeTokenCommand } from '@src/core/application/use-cases/oauth/commands/exchange-token.command';
+import { RevokeTokenCommand } from '@src/core/application/use-cases/oauth/commands/revoke-token.command';
+import { GetUserInfoQuery } from '@src/core/application/use-cases/oauth/queries/get-user-info.query';
 import { UserInfoResponse } from './dto/responses/userinfo.response';
 
 @Controller('oauth')

@@ -1,5 +1,5 @@
 // src/core/application/use-cases/client/commands/update-client.command.ts
-import { UpdateClientRequest } from '../../../../../interfaces/controllers/client/dto/requests/update-client.request';
+import { UpdateClientRequest } from '@src/interfaces/controllers/client/dto/requests/update-client.request';
 
 export class UpdateClientCommand {
   constructor(

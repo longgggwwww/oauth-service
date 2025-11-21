@@ -1,7 +1,7 @@
 import { Controller, Get, Put, Body, UseGuards, Req, Param } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetUserProfileQuery } from '../../../core/application/use-cases/user/queries/get-user-profile.query';
-import { UpdateUserProfileCommand } from '../../../core/application/use-cases/user/commands/update-user-profile.command';
+import { GetUserProfileQuery } from '@src/core/application/use-cases/user/queries/get-user-profile.query';
+import { UpdateUserProfileCommand } from '@src/core/application/use-cases/user/commands/update-user-profile.command';
 import { UpdateUserProfileRequest } from './dto/requests/update-user-profile.request';
 import { UserProfileResponse } from './dto/responses/user-profile.response';
 

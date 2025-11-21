@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { AuthSessionEntity } from '../../../../core/domain/entities/auth-session.entity';
+import { AuthSessionEntity } from '@src/core/domain/entities/auth-session.entity';
 
 @Injectable()
 export class AuthSessionRepository {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { ClientAppEntity, ClientRole, GrantType } from '../../../../core/domain/entities/client.entity';
-import { ClientRepositoryPort } from '../../../../core/application/ports/repositories/client-repository.port';
+import { ClientAppEntity, ClientRole, GrantType } from '@src/core/domain/entities/client.entity';
+import { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
 
 @Injectable()
 export class ClientRepository implements ClientRepositoryPort {

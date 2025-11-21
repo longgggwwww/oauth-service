@@ -3,10 +3,10 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserRequest } from './dto/requests/register-user.request';
 import { LoginRequest } from './dto/requests/login.request';
 
-import { RegisterUserCommand } from '../../../core/application/use-cases/auth/commands/register-user.command';
-import { AuthenticateCommand } from '../../../core/application/use-cases/auth/commands/authenticate.command';
+import { RegisterUserCommand } from '@src/core/application/use-cases/auth/commands/register-user.command';
+import { AuthenticateCommand } from '@src/core/application/use-cases/auth/commands/authenticate.command';
 
-import { LogoutCommand } from '../../../core/application/use-cases/auth/commands/logout.command';
+import { LogoutCommand } from '@src/core/application/use-cases/auth/commands/logout.command';
 
 /**
  * AuthController

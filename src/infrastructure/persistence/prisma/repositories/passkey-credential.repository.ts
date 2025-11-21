@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { PasskeyCredentialEntity } from '../../../../core/domain/entities/passkey-credential.entity';
+import { PasskeyCredentialEntity } from '@src/core/domain/entities/passkey-credential.entity';
 
 @Injectable()
 export class PasskeyCredentialRepository {

@@ -2,9 +2,9 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteClientCommand } from '../delete-client.command';
-import type { ClientRepositoryPort } from '../../../../ports/repositories/client-repository.port';
-import type { TokenRepositoryPort } from '../../../../ports/repositories/token-repository.port';
-import { ClientNotFoundException } from '../../../../../domain/exceptions/domain.exception';
+import type { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
+import type { TokenRepositoryPort } from '@src/core/application/ports/repositories/token-repository.port';
+import { ClientNotFoundException } from '@src/core/domain/exceptions/domain.exception';
 
 @CommandHandler(DeleteClientCommand)
 export class DeleteClientHandler

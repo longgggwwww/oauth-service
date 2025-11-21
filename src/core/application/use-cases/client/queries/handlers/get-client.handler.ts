@@ -2,9 +2,9 @@
 import { Inject } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetClientQuery } from '../get-client.query';
-import type { ClientRepositoryPort } from '../../../../ports/repositories/client-repository.port';
-import { ClientAppEntity } from '../../../../../domain/entities/client.entity';
-import { ClientNotFoundException } from '../../../../../domain/exceptions/domain.exception';
+import type { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
+import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
+import { ClientNotFoundException } from '@src/core/domain/exceptions/domain.exception';
 
 @QueryHandler(GetClientQuery)
 export class GetClientHandler implements IQueryHandler<GetClientQuery> {

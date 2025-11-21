@@ -10,18 +10,18 @@ import {
   Post,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { GetUserClientsQuery } from '../../../core/application/use-cases/client/queries/get-user-clients.query';
-import { GetClientQuery } from '../../../core/application/use-cases/client/queries/get-client.query';
-import { UpdateClientCommand } from '../../../core/application/use-cases/client/commands/update-client.command';
-import { DeleteClientCommand } from '../../../core/application/use-cases/client/commands/delete-client.command';
+import { GetUserClientsQuery } from '@src/core/application/use-cases/client/queries/get-user-clients.query';
+import { GetClientQuery } from '@src/core/application/use-cases/client/queries/get-client.query';
+import { UpdateClientCommand } from '@src/core/application/use-cases/client/commands/update-client.command';
+import { DeleteClientCommand } from '@src/core/application/use-cases/client/commands/delete-client.command';
 import { ClientListResponse } from './dto/responses/client-list.response';
 import { ClientDetailsResponse } from './dto/responses/client-details.response';
 import { UpdateClientRequest } from './dto/requests/update-client.request';
-import { ClientSummary } from '../../../core/shared/types';
-import { ClientAppEntity } from '../../../core/domain/entities/client.entity';
+import { ClientSummary } from '@src/core/shared/types';
+import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
 import { CreateClientRequest } from './dto/requests/create-client.request';
 import { ClientRegistrationResponse } from './dto/responses/client-registration.response';
-import { RegisterClientCommand } from '../../../core/application/use-cases/client/commands/register-client.command';
+import { RegisterClientCommand } from '@src/core/application/use-cases/client/commands/register-client.command';
 
 @Controller('clients')
 // @UseGuards(JwtAuthGuard) // TODO: Implement guard

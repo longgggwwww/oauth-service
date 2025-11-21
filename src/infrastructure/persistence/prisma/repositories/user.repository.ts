@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { UserAggregate } from '../../../../core/domain/aggregates/user-aggregate';
-import { UserRepositoryPort } from '../../../../core/application/ports/repositories/user-repository.port';
+import { UserAggregate } from '@src/core/domain/aggregates/user-aggregate';
+import { UserRepositoryPort } from '@src/core/application/ports/repositories/user-repository.port';
 
 @Injectable()
 export class UserRepository implements UserRepositoryPort {

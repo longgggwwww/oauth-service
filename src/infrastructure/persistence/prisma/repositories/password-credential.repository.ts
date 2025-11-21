@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { PasswordCredentialEntity } from '../../../../core/domain/entities/password-credential.entity';
+import { PasswordCredentialEntity } from '@src/core/domain/entities/password-credential.entity';
 
 @Injectable()
 export class PasswordCredentialRepository {

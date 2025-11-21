@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { RefreshTokenEntity } from '../../../../core/domain/entities/token.entity';
+import { RefreshTokenEntity } from '@src/core/domain/entities/token.entity';
 
 @Injectable()
 export class TokenRepository {

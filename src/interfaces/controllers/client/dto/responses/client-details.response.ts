@@ -1,5 +1,5 @@
 // src/interfaces/controllers/client/dto/responses/client-details.response.ts
-import { ClientAppEntity } from '../../../../../core/domain/entities/client.entity';
+import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
 
 export class ClientDetailsResponse {
   id: string;

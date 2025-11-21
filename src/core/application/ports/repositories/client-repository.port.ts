@@ -1,4 +1,4 @@
-import { ClientAppEntity } from '../../../domain/entities/client.entity';
+import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
 
 export interface ClientRepositoryPort {
   findByClientId(clientId: string): Promise<ClientAppEntity | null>;

@@ -5,13 +5,13 @@ import { VerifyMfaRequest } from './dto/requests/verify-mfa.request';
 import { PasskeyRegistrationRequest } from './dto/requests/passkey-registration.request';
 import { PasskeyAuthRequest } from './dto/requests/passkey-auth.request';
 import { MfaSetupResponse } from './dto/responses/mfa-setup.response';
-import { EnableMfaCommand } from '../../../core/application/use-cases/mfa/commands/enable-mfa.command';
-import { VerifyMfaCommand } from '../../../core/application/use-cases/mfa/commands/verify-mfa.command';
-import { DisableMfaCommand } from '../../../core/application/use-cases/mfa/commands/disable-mfa.command';
-import { StartPasskeyRegistrationCommand } from '../../../core/application/use-cases/mfa/commands/start-passkey-registration.command';
-import { FinishPasskeyRegistrationCommand } from '../../../core/application/use-cases/mfa/commands/finish-passkey-registration.command';
-import { StartPasskeyAuthCommand } from '../../../core/application/use-cases/mfa/commands/start-passkey-auth.command';
-import { FinishPasskeyAuthCommand } from '../../../core/application/use-cases/mfa/commands/finish-passkey-auth.command';
+import { EnableMfaCommand } from '@src/core/application/use-cases/mfa/commands/enable-mfa.command';
+import { VerifyMfaCommand } from '@src/core/application/use-cases/mfa/commands/verify-mfa.command';
+import { DisableMfaCommand } from '@src/core/application/use-cases/mfa/commands/disable-mfa.command';
+import { StartPasskeyRegistrationCommand } from '@src/core/application/use-cases/mfa/commands/start-passkey-registration.command';
+import { FinishPasskeyRegistrationCommand } from '@src/core/application/use-cases/mfa/commands/finish-passkey-registration.command';
+import { StartPasskeyAuthCommand } from '@src/core/application/use-cases/mfa/commands/start-passkey-auth.command';
+import { FinishPasskeyAuthCommand } from '@src/core/application/use-cases/mfa/commands/finish-passkey-auth.command';
 
 @Controller('mfa')
 export class MfaController {

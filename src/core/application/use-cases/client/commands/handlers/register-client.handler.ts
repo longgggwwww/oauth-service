@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RegisterClientCommand } from '../register-client.command';
-import { ClientAppEntity, ClientRole, GrantType } from '../../../../../domain/entities/client.entity';
-import type { ClientRepositoryPort } from '../../../../../application/ports/repositories/client-repository.port';
-import { CryptoService } from '../../../../../application/services/crypto.service';
+import { ClientAppEntity, ClientRole, GrantType } from '@src/core/domain/entities/client.entity';
+import type { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
+import { CryptoService } from '@src/core/application/services/crypto.service';
 
 @CommandHandler(RegisterClientCommand)
 export class RegisterClientHandler

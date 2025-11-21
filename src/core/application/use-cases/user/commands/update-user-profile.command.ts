@@ -1,4 +1,4 @@
-import { UpdateUserProfileRequest } from '../../../../../interfaces/controllers/user/dto/requests/update-user-profile.request';
+import { UpdateUserProfileRequest } from '@src/interfaces/controllers/user/dto/requests/update-user-profile.request';
 
 export class UpdateUserProfileCommand {
     constructor(

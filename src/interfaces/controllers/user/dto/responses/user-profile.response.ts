@@ -1,4 +1,4 @@
-import { UserProfileEntity } from '../../../../../core/domain/entities/user-profile.entity';
+import { UserProfileEntity } from '@src/core/domain/entities/user-profile.entity';
 
 export class UserProfileResponse {
     id: string;

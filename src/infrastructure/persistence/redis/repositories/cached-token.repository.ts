@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TokenRepositoryPort } from '../../../../core/application/ports/repositories/token-repository.port';
+import { TokenRepositoryPort } from '@src/core/application/ports/repositories/token-repository.port';
 
 @Injectable()
 export class CachedTokenRepository implements TokenRepositoryPort {

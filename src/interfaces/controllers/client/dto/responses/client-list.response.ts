@@ -1,5 +1,5 @@
 // src/interfaces/controllers/client/dto/responses/client-list.response.ts
-import { ClientSummary } from '../../../../../core/shared/types';
+import { ClientSummary } from '@src/core/shared/types';
 import { ClientSummaryResponse } from './client-summary.response';
 
 export class ClientListResponse {

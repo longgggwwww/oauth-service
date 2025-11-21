@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { TwoFactorMethodEntity } from '../../../../core/domain/entities/two-factor-method.entity';
+import { TwoFactorMethodEntity } from '@src/core/domain/entities/two-factor-method.entity';
 
 @Injectable()
 export class TwoFactorMethodRepository {
