@@ -1,1 +1,14 @@
-export class LoginRequest {}
+import { IsEmail, IsString, IsOptional } from 'class-validator';
+
+export class LoginRequest {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    password: string;
+
+    @IsOptional()
+    @IsString()
+    mfaToken?: string;
+}
+

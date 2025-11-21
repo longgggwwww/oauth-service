@@ -1,13 +1,11 @@
+import { UserStatus } from '../entities/user.entity';
+
 export class UserAggregate {
   id: string;
   email: string;
-  passwordHash?: string;
-  username?: string;
-  emailVerified: boolean;
-  mfaEnabled: boolean;
-  mfaSecret?: string;
-  lastLoginAt?: Date;
+  phoneNumber?: string;
+  status: UserStatus;
+  createdViaClientId?: string;
   createdAt: Date;
   updatedAt: Date;
-  active: boolean;
 }

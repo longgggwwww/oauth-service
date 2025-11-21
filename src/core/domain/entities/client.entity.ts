@@ -1,49 +1,88 @@
-export class ClientEntity {
+export enum ClientRole {
+  SERVICE_ACCOUNT = 'SERVICE_ACCOUNT',
+  THIRD_PARTY_APP = 'THIRD_PARTY_APP',
+}
+
+export enum GrantType {
+  AUTHORIZATION_CODE = 'AUTHORIZATION_CODE',
+  REFRESH_TOKEN = 'REFRESH_TOKEN',
+  CLIENT_CREDENTIALS = 'CLIENT_CREDENTIALS',
+  PASSWORD = 'PASSWORD',
+}
+
+export class ClientAppEntity {
   id: string;
-  name: string;
-  description?: string;
   clientId: string;
   clientSecret: string;
+  appName: string;
+  description?: string;
+  role: ClientRole;
+  authorities: string[];
   redirectUris: string[];
-  grantTypes: string[];
-  scope?: string[];
-  websiteUrl?: string;
-  logoUrl?: string;
-  contacts?: string[];
-  autoApprove: boolean;
-  userId: string;
+  allowedGrantTypes: GrantType[];
   createdAt: Date;
   updatedAt: Date;
+
+  constructor(
+    id: string,
+    clientId: string,
+    clientSecret: string,
+    appName: string,
+    role: ClientRole,
+    authorities: string[],
+    redirectUris: string[],
+    allowedGrantTypes: GrantType[],
+    createdAt: Date,
+    updatedAt: Date,
+    description?: string,
+  ) {
+    this.id = id;
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.appName = appName;
+    this.role = role;
+    this.authorities = authorities;
+    this.redirectUris = redirectUris;
+    this.allowedGrantTypes = allowedGrantTypes;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.description = description;
+  }
 
   static create(
     clientId: string,
     clientSecret: string,
-    name: string,
+    appName: string,
     redirectUris: string[],
-    userId: string,
+    allowedGrantTypes: GrantType[],
+    role: ClientRole = ClientRole.THIRD_PARTY_APP,
+    authorities: string[] = [],
     description?: string,
-    grantTypes?: string[],
-    scope?: string[],
-    websiteUrl?: string,
-    logoUrl?: string,
-    contacts?: string[],
-  ): ClientEntity {
-    const client = new ClientEntity();
-    client.id = crypto.randomUUID(); // or use a proper ID generator
-    client.clientId = clientId;
-    client.clientSecret = clientSecret;
-    client.name = name;
-    client.redirectUris = redirectUris;
-    client.userId = userId;
-    client.description = description;
-    client.grantTypes = grantTypes || ['authorization_code'];
-    client.scope = scope;
-    client.websiteUrl = websiteUrl;
-    client.logoUrl = logoUrl;
-    client.contacts = contacts;
-    client.autoApprove = false;
-    client.createdAt = new Date();
-    client.updatedAt = new Date();
-    return client;
+  ): ClientAppEntity {
+    return new ClientAppEntity(
+      crypto.randomUUID(),
+      clientId,
+      clientSecret,
+      appName,
+      role,
+      authorities,
+      redirectUris,
+      allowedGrantTypes,
+      new Date(),
+      new Date(),
+      description,
+    );
+  }
+
+  isServiceAccount(): boolean {
+    return this.role === ClientRole.SERVICE_ACCOUNT;
+  }
+
+  hasAuthority(authority: string): boolean {
+    return this.authorities.includes(authority);
+  }
+
+  supportsGrantType(grantType: GrantType): boolean {
+    return this.allowedGrantTypes.includes(grantType);
   }
 }

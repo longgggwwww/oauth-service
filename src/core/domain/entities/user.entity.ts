@@ -1,22 +1,15 @@
 export enum UserStatus {
     ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
     SUSPENDED = 'SUSPENDED',
-    PENDING = 'PENDING',
+    PENDING_VERIFICATION = 'PENDING_VERIFICATION',
 }
 
 export class UserEntity {
     id: string;
     email: string;
     phoneNumber?: string;
-    passwordHash?: string;
-    username?: string;
-    emailVerified: boolean;
-    phoneNumberVerified: boolean;
     status: UserStatus;
-    mfaEnabled: boolean;
-    mfaSecret?: string;
-    lastLoginAt?: Date;
+    createdViaClientId?: string;
     createdAt: Date;
     updatedAt: Date;
 
@@ -24,46 +17,33 @@ export class UserEntity {
         id: string,
         email: string,
         status: UserStatus,
-        emailVerified: boolean,
-        phoneNumberVerified: boolean,
-        mfaEnabled: boolean,
         createdAt: Date,
         updatedAt: Date,
         phoneNumber?: string,
-        passwordHash?: string,
-        username?: string,
-        mfaSecret?: string,
-        lastLoginAt?: Date,
+        createdViaClientId?: string,
     ) {
         this.id = id;
         this.email = email;
         this.status = status;
-        this.emailVerified = emailVerified;
-        this.phoneNumberVerified = phoneNumberVerified;
-        this.mfaEnabled = mfaEnabled;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.phoneNumber = phoneNumber;
-        this.passwordHash = passwordHash;
-        this.username = username;
-        this.mfaSecret = mfaSecret;
-        this.lastLoginAt = lastLoginAt;
+        this.createdViaClientId = createdViaClientId;
     }
 
-    static create(email: string, username?: string, phoneNumber?: string): UserEntity {
+    static create(
+        email: string,
+        phoneNumber?: string,
+        createdViaClientId?: string,
+    ): UserEntity {
         return new UserEntity(
             crypto.randomUUID(),
             email,
-            UserStatus.PENDING,
-            false,
-            false,
-            false,
+            UserStatus.PENDING_VERIFICATION,
             new Date(),
             new Date(),
             phoneNumber,
-            undefined,
-            username,
+            createdViaClientId,
         );
     }
 }
-

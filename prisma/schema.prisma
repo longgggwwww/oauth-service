@@ -1,271 +1,226 @@
-generator client {
-    provider = "prisma-client-js"
-}
-
 datasource db {
     provider = "postgresql"
 }
 
-enum UserStatus {
-    ACTIVE
-    INACTIVE
-    SUSPENDED
-    PENDING
+generator client {
+    provider = "prisma-client-js"
 }
 
+// --- ENUMS ---
+
+enum UserStatus {
+    ACTIVE
+    SUSPENDED
+    PENDING_VERIFICATION
+}
+
+enum GrantType {
+    AUTHORIZATION_CODE
+    REFRESH_TOKEN
+    CLIENT_CREDENTIALS // Quan trọng cho yêu cầu của bạn
+    PASSWORD
+}
+
+enum ClientRole {
+    SERVICE_ACCOUNT // Client dùng để chạy background/admin task
+    THIRD_PARTY_APP // Client thông thường
+}
+
+// --- CORE IDENTITY (User) ---
+
 model User {
-    id                    String     @id @default(uuid())
-    email                 String     @unique
-    phone_number          String?    @unique
-    password_hash         String?
-    username              String?    @unique
-    email_verified        Boolean    @default(false)
-    phone_number_verified Boolean    @default(false)
-    status                UserStatus @default(ACTIVE)
-    mfa_enabled           Boolean    @default(false)
-    mfa_secret            String?
-    last_login_at         DateTime?
-    created_at            DateTime   @default(now())
-    updated_at            DateTime   @updatedAt
-    active                Boolean    @default(true) // Deprecated, use status
+    id          String  @id @default(uuid())
+    email       String  @unique
+    phoneNumber String? @unique
+
+    // Password & Security
+    password   PasswordCredential?
+    passkeys   PasskeyCredential[]
+    mfaMethods TwoFactorMethod[]
+
+    status UserStatus @default(ACTIVE)
+
+    // Audit: User này được tạo bởi Client nào? (Quan trọng theo yêu cầu của bạn)
+    createdViaClientId String?
+    createdViaClient   ClientApp? @relation("ClientCreatedUsers", fields: [createdViaClientId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     // Relations
-    clients             Client[]
-    authorization_codes AuthorizationCode[]
-    access_tokens       AccessToken[]
-    refresh_tokens      RefreshToken[]
-    user_consents       UserConsent[]
-    profile             UserProfile?
-    mfa_devices         MfaDevice[]
-    passkeys            Passkey[]
-    backup_codes        BackupCode[]
-    auth_sessions       AuthSession[]
+    profile  UserProfile?
+    consents UserConsent[]
+    sessions AuthSession[]
+
+    // Trong luồng Authorization Code (User login), User sở hữu tokens
+    authCodes     AuthorizationCode[]
+    refreshTokens RefreshToken[]
 
     @@map("users")
 }
 
-model Client {
-    id            String   @id @default(uuid())
-    name          String
-    description   String?
-    client_id     String   @unique
-    client_secret String
-    redirect_uris Json // Array of redirect URIs
-    grant_types   Json // Array of grant types
-    scope         Json? // Array of scopes
-    website_url   String?
-    logo_url      String?
-    contacts      Json? // Array of contact emails
-    auto_approve  Boolean  @default(false)
-    created_at    DateTime @default(now())
-    updated_at    DateTime @updatedAt
-
-    // Relations
-    user_id             String
-    user                User                @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    authorization_codes AuthorizationCode[]
-    access_tokens       AccessToken[]
-    refresh_tokens      RefreshToken[]
-    user_consents       UserConsent[]
-    client_scopes       ClientScope[]
-    auth_sessions       AuthSession[]
-
-    @@map("clients")
-}
-
-model AuthorizationCode {
-    id                    String   @id @default(uuid())
-    code                  String
-    client_id             String
-    user_id               String
-    redirect_uri          String?
-    scope                 Json?
-    code_challenge        String?
-    code_challenge_method String?
-    expires_at            DateTime
-    created_at            DateTime @default(now())
-
-    // Relations
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-    @@unique([code])
-    @@index([expires_at])
-    @@map("authorization_codes")
-}
-
-model AccessToken {
-    id         String   @id @default(uuid())
-    token      String
-    client_id  String
-    user_id    String
-    scope      Json?
-    expires_at DateTime
-    created_at DateTime @default(now())
-    revoked    Boolean  @default(false)
-
-    // Relations
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-    @@unique([token])
-    @@index([expires_at])
-    @@map("access_tokens")
-}
-
-model RefreshToken {
-    id         String   @id @default(uuid())
-    token      String
-    client_id  String
-    user_id    String
-    scope      Json?
-    expires_at DateTime
-    created_at DateTime @default(now())
-    revoked    Boolean  @default(false)
-
-    // Relations
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-    @@unique([token])
-    @@index([expires_at])
-    @@map("refresh_tokens")
-}
-
-model UserConsent {
-    id         String    @id @default(uuid())
-    user_id    String
-    client_id  String
-    scope      Json?
-    granted_at DateTime  @default(now())
-    expires_at DateTime?
-
-    // Relations
-    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-
-    @@unique([user_id, client_id])
-    @@map("user_consents")
-}
-
 model UserProfile {
-    id          String    @id @default(uuid())
-    user_id     String    @unique
-    given_name  String?
-    family_name String?
-    picture     String?
-    avatar_url  String?
-    locale      String?   @default("en")
-    timezone    String?
-    birth_date  DateTime?
-    created_at  DateTime  @default(now())
-    updated_at  DateTime  @updatedAt
-
-    // Relations
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    id        String    @id @default(uuid())
+    userId    String    @unique
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    fullName  String?
+    avatarUrl String?
+    birthDate DateTime?
 
     @@map("user_profiles")
 }
 
-model MfaDevice {
-    id           String    @id @default(uuid())
-    user_id      String
-    name         String
-    type         String // "totp", "sms", "email", "webauthn"
-    secret       String?
-    phone_number String?
-    backup_codes Json?
-    verified     Boolean   @default(false)
-    last_used_at DateTime?
-    last_sent_at DateTime?
-    created_at   DateTime  @default(now())
-    updated_at   DateTime  @updatedAt
+// --- CLIENT APPLICATION (The Admin/Service) ---
+
+model ClientApp {
+    id           String  @id @default(uuid())
+    clientId     String  @unique
+    clientSecret String // Hash (Bcrypt/Argon2)
+    appName      String
+    description  String?
+
+    // Role xác định Client này có quyền quản trị hay không
+    role ClientRole @default(THIRD_PARTY_APP)
+
+    // Cấu hình các quyền mặc định của Client (ví dụ: ["user:create", "system:read"])
+    authorities String[]
+
+    // Config OAuth
+    redirectUris      String[]
+    allowedGrantTypes GrantType[] // Cần chứa "CLIENT_CREDENTIALS"
+    allowedScopes     Scope[]     @relation("ClientAllowedScopes")
 
     // Relations
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    // Client này đã tạo ra những user nào?
+    createdUsers User[] @relation("ClientCreatedUsers")
 
-    @@index([user_id, type])
-    @@map("mfa_devices")
+    // Tokens do Client này sở hữu (khi dùng Client Credentials flow)
+    issuedRefreshTokens RefreshToken[]
+
+    // OAuth relations khác
+    consents  UserConsent[]
+    authCodes AuthorizationCode[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("oauth_clients")
 }
 
-model Passkey {
-    id               String    @id @default(uuid())
-    user_id          String
-    credential_id    String    @unique
-    public_key       String
-    transports       String?
-    counter          Int
-    attestation_type String?
-    aaguid           String?
-    device_type      String?
-    backed_up        Boolean?
-    last_used_at     DateTime?
-    created_at       DateTime  @default(now())
-    updated_at       DateTime  @updatedAt
+// --- CREDENTIALS & MFA (Giữ nguyên như cũ) ---
+model PasswordCredential {
+    id           String   @id @default(uuid())
+    userId       String   @unique
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    passwordHash String
+    updatedAt    DateTime @updatedAt
 
-    // Relations
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-    @@index([user_id])
-    @@map("passkeys")
+    @@map("user_passwords")
 }
 
-model BackupCode {
-    id         String    @id @default(uuid())
-    user_id    String
-    code_hash  String
-    used       Boolean   @default(false)
-    created_at DateTime  @default(now())
-    used_at    DateTime?
+model PasskeyCredential {
+    id           String   @id @default(uuid())
+    userId       String
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    credentialId String   @unique
+    publicKey    String   @db.Text
+    signCount    Int      @default(0)
+    transports   String[]
+    createdAt    DateTime @default(now())
 
-    // Relations
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-    @@index([user_id, used])
-    @@map("backup_codes")
+    @@map("user_passkeys")
 }
 
-model ClientScope {
-    id          String  @id @default(uuid())
-    client_id   String
-    scope       String
-    description String?
+model TwoFactorMethod {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    type      String // TOTP, SMS
+    secret    String
+    isDefault Boolean  @default(false)
+    createdAt DateTime @default(now())
 
-    // Relations
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-
-    @@unique([client_id, scope])
-    @@map("client_scopes")
+    @@map("user_mfa_methods")
 }
 
+// --- SCOPES ---
 model Scope {
-    id          String   @id @default(uuid())
-    name        String   @unique
+    id          String  @id @default(uuid())
+    name        String  @unique // e.g., "user:create", "openid"
     description String?
-    is_system   Boolean  @default(false)
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
 
-    @@map("scopes")
+    clients   ClientApp[]         @relation("ClientAllowedScopes")
+    consents  UserConsent[]       @relation("ConsentScopes")
+    authCodes AuthorizationCode[] @relation("AuthCodeScopes")
+
+    @@map("oauth_scopes")
+}
+
+// --- TOKENS (Updated for M2M) ---
+
+model RefreshToken {
+    id    String @id @default(uuid())
+    token String @unique
+
+    clientId String
+    client   ClientApp @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+    // QUAN TRỌNG: userId có thể NULL
+    // Nếu userId = null -> Token này là "App Token" (Client Credentials Flow)
+    // Nếu userId != null -> Token này là "User Token" (Authorization Code Flow)
+    userId String?
+    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    scopes String[] // Snapshot các quyền của token này
+
+    parentTokenId String?
+    revoked       Boolean  @default(false)
+    expiresAt     DateTime
+    createdAt     DateTime @default(now())
+
+    @@map("oauth_refresh_tokens")
+}
+
+model AuthorizationCode {
+    id       String    @id @default(uuid())
+    code     String    @unique
+    clientId String
+    client   ClientApp @relation(fields: [clientId], references: [id], onDelete: Cascade)
+    userId   String
+    user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Session chỉ cần thiết cho User Login flow
+    sessionId String?
+    session   AuthSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+    scopes Scope[] @relation("AuthCodeScopes")
+
+    codeChallenge String
+    expiresAt     DateTime
+
+    @@map("oauth_auth_codes")
+}
+
+// --- SESSIONS (Chỉ dùng cho User login) ---
+model UserConsent {
+    id            String    @id @default(uuid())
+    userId        String
+    user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    clientId      String
+    client        ClientApp @relation(fields: [clientId], references: [id], onDelete: Cascade)
+    grantedScopes Scope[]   @relation("ConsentScopes")
+
+    @@unique([userId, clientId])
+    @@map("oauth_consents")
 }
 
 model AuthSession {
-    id               String   @id @default(uuid())
-    user_id          String
-    client_id        String
-    session_token    String   @unique
-    state            Json?
-    ip_address       String?
-    user_agent       String?
-    expires_at       DateTime
-    is_mfa_completed Boolean  @default(false)
-    created_at       DateTime @default(now())
+    id             String              @id @default(uuid())
+    userId         String
+    user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    isMfaCompleted Boolean             @default(false)
+    expiresAt      DateTime
+    authCodes      AuthorizationCode[]
 
-    // Relations
-    user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    client Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
-
-    @@index([expires_at])
-    @@index([session_token])
     @@map("auth_sessions")
 }

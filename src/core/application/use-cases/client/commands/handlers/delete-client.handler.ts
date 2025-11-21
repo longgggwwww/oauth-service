@@ -8,14 +8,13 @@ import { ClientNotFoundException } from '../../../../../domain/exceptions/domain
 
 @CommandHandler(DeleteClientCommand)
 export class DeleteClientHandler
-  implements ICommandHandler<DeleteClientCommand>
-{
+  implements ICommandHandler<DeleteClientCommand> {
   constructor(
     @Inject('ClientRepositoryPort')
     private readonly clientRepository: ClientRepositoryPort,
     @Inject('TokenRepositoryPort')
     private readonly tokenRepository: TokenRepositoryPort,
-  ) {}
+  ) { }
 
   async execute(command: DeleteClientCommand): Promise<void> {
     const client = await this.clientRepository.findById(command.clientId);
@@ -24,14 +23,13 @@ export class DeleteClientHandler
       throw new ClientNotFoundException();
     }
 
-    if (client.userId !== command.userId) {
-      throw new ClientNotFoundException(); // Don't reveal existence to non-owners
-    }
+    // TODO: Add authorization check - verify requesting user has permission to delete this client
+    // This could be done via client authorities or a separate permission system
 
     // Revoke all tokens for this client
     await this.tokenRepository.revokeAllClientTokens(command.clientId);
 
-    // Delete the client
-    await this.clientRepository.delete(command.clientId);
+    // Delete the client by ID (not clientId)
+    await this.clientRepository.delete(client.id);
   }
 }

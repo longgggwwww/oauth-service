@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   HttpCode,
+  Post,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { GetUserClientsQuery } from '../../../core/application/use-cases/client/queries/get-user-clients.query';
@@ -17,7 +18,10 @@ import { ClientListResponse } from './dto/responses/client-list.response';
 import { ClientDetailsResponse } from './dto/responses/client-details.response';
 import { UpdateClientRequest } from './dto/requests/update-client.request';
 import { ClientSummary } from '../../../core/shared/types';
-import { ClientEntity } from '../../../core/domain/entities/client.entity';
+import { ClientAppEntity } from '../../../core/domain/entities/client.entity';
+import { CreateClientRequest } from './dto/requests/create-client.request';
+import { ClientRegistrationResponse } from './dto/responses/client-registration.response';
+import { RegisterClientCommand } from '../../../core/application/use-cases/client/commands/register-client.command';
 
 @Controller('clients')
 // @UseGuards(JwtAuthGuard) // TODO: Implement guard
@@ -25,7 +29,32 @@ export class ClientController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
-  ) {}
+  ) { }
+
+  @Post()
+  async createClient(@Body() request: CreateClientRequest): Promise<ClientRegistrationResponse> {
+    const command = new RegisterClientCommand(
+      request.name,
+      request.redirectUris,
+      request.description,
+      request.grantTypes,
+      request.scope,
+      request.websiteUrl,
+      request.logoUrl,
+      request.contacts,
+    );
+
+    const { client, plainSecret } = await this.commandBus.execute(command);
+
+    return {
+      id: client.id,
+      clientId: client.clientId,
+      clientSecret: plainSecret,
+      name: client.appName,
+      redirectUris: client.redirectUris,
+      createdAt: client.createdAt,
+    };
+  }
 
   @Get()
   async getClients(/* @CurrentUser() user: User */): Promise<ClientListResponse> {
