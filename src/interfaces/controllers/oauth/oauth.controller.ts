@@ -9,6 +9,9 @@ import { ExchangeTokenCommand } from '@src/core/application/use-cases/oauth/comm
 import { RevokeTokenCommand } from '@src/core/application/use-cases/oauth/commands/revoke-token.command';
 import { GetUserInfoQuery } from '@src/core/application/use-cases/oauth/queries/get-user-info.query';
 import { UserInfoResponse } from './dto/responses/userinfo.response';
+import { JwtAuthGuard } from '@src/infrastructure/common/guards/jwt-auth.guard';
+import { CurrentUser } from '@src/infrastructure/common/decorators/current-user.decorator';
+import type { JwtPayload } from '@src/core/application/services/token.service';
 
 @Controller('oauth')
 export class OauthController {
@@ -42,10 +45,18 @@ export class OauthController {
   }
 
   @Get('userinfo')
-  async userinfo(@Req() req): Promise<UserInfoResponse> {
-    // TODO: Extract access token from Authorization header
-    const accessToken = req.headers.authorization?.split(' ')[1];
-    const query = new GetUserInfoQuery(accessToken);
+  @UseGuards(JwtAuthGuard)
+  async userinfo(@CurrentUser() user: JwtPayload): Promise<UserInfoResponse> {
+    // User ID comes from JWT token payload
+    if (!user.sub) {
+      // This is a client credentials token (no user)
+      return {
+        sub: user.clientId,
+        client_id: user.clientId,
+      } as any;
+    }
+
+    const query = new GetUserInfoQuery(user.sub);
     return this.queryBus.execute(query);
   }
 

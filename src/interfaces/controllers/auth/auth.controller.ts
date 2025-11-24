@@ -35,6 +35,8 @@ export class AuthController {
         const command = new AuthenticateCommand(
             request.email,
             request.password,
+            request.clientId,
+            request.clientSecret,
             request.mfaToken,
         );
         return this.commandBus.execute(command);

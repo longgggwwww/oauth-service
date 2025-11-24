@@ -10,7 +10,7 @@ export class CreateClientRequest {
     description?: string;
 
     @IsArray()
-    @IsUrl({}, { each: true })
+    @IsUrl({ require_tld: false }, { each: true })
     redirectUris: string[];
 
     @IsOptional()
@@ -24,11 +24,11 @@ export class CreateClientRequest {
     scope?: string[];
 
     @IsOptional()
-    @IsUrl()
+    @IsUrl({ require_tld: false })
     websiteUrl?: string;
 
     @IsOptional()
-    @IsUrl()
+    @IsUrl({ require_tld: false })
     logoUrl?: string;
 
     @IsOptional()

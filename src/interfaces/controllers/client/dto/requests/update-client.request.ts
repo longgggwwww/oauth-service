@@ -14,7 +14,7 @@ export class UpdateClientRequest {
   name?: string;
 
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl({ require_tld: false }, { each: true })
   @IsOptional()
   redirectUris?: string[];
 
@@ -23,11 +23,11 @@ export class UpdateClientRequest {
   @IsOptional()
   scope?: string[];
 
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   @IsOptional()
   websiteUrl?: string;
 
-  @IsUrl()
+  @IsUrl({ require_tld: false })
   @IsOptional()
   logoUrl?: string;
 }

@@ -7,6 +7,13 @@ export class LoginRequest {
     @IsString()
     password: string;
 
+    @IsString()
+    clientId: string;
+
+    @IsOptional()
+    @IsString()
+    clientSecret?: string;
+
     @IsOptional()
     @IsString()
     mfaToken?: string;

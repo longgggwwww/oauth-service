@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OauthModule } from './interfaces/controllers/oauth/oauth.module';
@@ -8,7 +9,14 @@ import { UserModule } from './interfaces/controllers/user/user.module';
 import { MfaModule } from './interfaces/controllers/mfa/mfa.module';
 
 @Module({
-  imports: [OauthModule, ClientModule, AuthModule, UserModule, MfaModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    OauthModule,
+    ClientModule,
+    AuthModule,
+    UserModule,
+    MfaModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

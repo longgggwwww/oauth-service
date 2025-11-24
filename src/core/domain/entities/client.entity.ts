@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 export enum ClientRole {
   SERVICE_ACCOUNT = 'SERVICE_ACCOUNT',
   THIRD_PARTY_APP = 'THIRD_PARTY_APP',
@@ -60,7 +62,7 @@ export class ClientAppEntity {
     description?: string,
   ): ClientAppEntity {
     return new ClientAppEntity(
-      crypto.randomUUID(),
+      randomUUID(),
       clientId,
       clientSecret,
       appName,
