@@ -10,15 +10,14 @@ import {
   Post,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { GetUserClientsQuery } from '@src/core/application/use-cases/client/queries/get-user-clients.query';
+import { GetAllClientsQuery } from '@src/core/application/use-cases/client/queries/get-all-clients.query';
 import { GetClientQuery } from '@src/core/application/use-cases/client/queries/get-client.query';
 import { UpdateClientCommand } from '@src/core/application/use-cases/client/commands/update-client.command';
 import { DeleteClientCommand } from '@src/core/application/use-cases/client/commands/delete-client.command';
 import { ClientListResponse } from './dto/responses/client-list.response';
 import { ClientDetailsResponse } from './dto/responses/client-details.response';
 import { UpdateClientRequest } from './dto/requests/update-client.request';
-import { ClientSummary } from '@src/core/shared/types';
-import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
+
 import { CreateClientRequest } from './dto/requests/create-client.request';
 import { ClientRegistrationResponse } from './dto/responses/client-registration.response';
 import { RegisterClientCommand } from '@src/core/application/use-cases/client/commands/register-client.command';
@@ -30,6 +29,8 @@ export class ClientController {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) { }
+
+
 
   @Post()
   async createClient(@Body() request: CreateClientRequest): Promise<ClientRegistrationResponse> {
@@ -57,11 +58,8 @@ export class ClientController {
   }
 
   @Get()
-  async getClients(/* @CurrentUser() user: User */): Promise<ClientListResponse> {
-    // TODO: Get user from guard
-    const userId = 'dummy-user-id'; // Replace with actual user extraction
-
-    const query = new GetUserClientsQuery(userId);
+  async getClients(): Promise<ClientListResponse> {
+    const query = new GetAllClientsQuery();
     const clients = await this.queryBus.execute(query);
 
     return ClientListResponse.fromClients(clients);

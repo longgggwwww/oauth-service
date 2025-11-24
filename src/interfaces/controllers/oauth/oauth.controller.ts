@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Body, Query, Req, Res, UseGuards, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+  HttpCode,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ClientAppEntity } from '@src/core/domain/entities/client.entity';
 import { AuthorizeRequest } from './dto/requests/authorize.request';
@@ -18,21 +28,53 @@ export class OauthController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) { }
-
-
+  ) {}
 
   @Get('authorize')
-  async authorize(@Query() request: AuthorizeRequest, @Req() req) {
-    // TODO: Check if user is logged in via session/cookie
-    const userId = 'dummy-user-id'; // Replace with actual user extraction if logged in
+  async authorize(@Query() request: AuthorizeRequest, @Req() req, @Res() res) {
+    // TODO: Replace with actual user session lookup
+    const userId = req.user && req.user.id ? req.user.id : undefined;
     const command = new AuthorizeCommand(request, userId);
-    return this.commandBus.execute(command);
+    const result = await this.commandBus.execute(command);
+
+    // If handler indicates login required, redirect user to login
+    if (result && result.login_required && result.redirect_to_login) {
+      return res.redirect(result.redirect_to_login);
+    }
+
+    // If handler returned redirectUri, perform redirect
+    if (result && result.redirectUri) {
+      return res.redirect(result.redirectUri);
+    }
+
+    // Fallback: return JSON
+    return result;
   }
 
   @Post('token')
   @HttpCode(200)
-  async token(@Body() request: TokenRequest) {
+  async token(@Body() request: TokenRequest, @Req() req) {
+    // Support HTTP Basic auth for client authentication (per RFC6749)
+    const authHeader = req.headers && req.headers['authorization'];
+    if (authHeader && typeof authHeader === 'string') {
+      const parts = authHeader.split(' ');
+      if (parts.length === 2 && parts[0] === 'Basic') {
+        try {
+          const decoded = Buffer.from(parts[1], 'base64').toString('utf8');
+          const idx = decoded.indexOf(':');
+          if (idx > -1) {
+            const clientId = decoded.slice(0, idx);
+            const clientSecret = decoded.slice(idx + 1);
+            // Populate request fields if not already set
+            if (!request.client_id) request.client_id = clientId;
+            if (!request.client_secret) request.client_secret = clientSecret;
+          }
+        } catch (e) {
+          // ignore parse errors and let validation handle missing credentials
+        }
+      }
+    }
+
     const command = new ExchangeTokenCommand(request);
     return this.commandBus.execute(command);
   }
@@ -71,7 +113,11 @@ export class OauthController {
       jwks_uri: `${issuer}/oauth/jwks`,
       scopes_supported: ['openid', 'profile', 'email'],
       response_types_supported: ['code', 'token', 'id_token', 'code id_token'],
-      grant_types_supported: ['authorization_code', 'refresh_token', 'client_credentials'],
+      grant_types_supported: [
+        'authorization_code',
+        'refresh_token',
+        'client_credentials',
+      ],
       subject_types_supported: ['public'],
       id_token_signing_alg_values_supported: ['RS256'],
     };

@@ -41,4 +41,13 @@ export class PasswordCredentialRepository {
             where: { userId },
         });
     }
+
+    async create(data: { userId: string; passwordHash: string }): Promise<void> {
+        await this.prisma.passwordCredential.create({
+            data: {
+                userId: data.userId,
+                passwordHash: data.passwordHash,
+            },
+        });
+    }
 }

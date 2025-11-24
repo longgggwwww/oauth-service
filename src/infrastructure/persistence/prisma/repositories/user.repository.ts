@@ -56,4 +56,30 @@ export class UserRepository implements UserRepositoryPort {
       },
     });
   }
+
+  async create(data: { email: string; phoneNumber?: string; status: string }): Promise<any> {
+    return this.prisma.user.create({
+      data: {
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        status: data.status as any,
+      },
+    });
+  }
+
+  async createProfile(userId: string, data: { fullName?: string }): Promise<any> {
+    return this.prisma.userProfile.create({
+      data: {
+        userId,
+        fullName: data.fullName,
+      },
+    });
+  }
+
+  async updateStatus(userId: string, status: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { status: status as any },
+    });
+  }
 }

@@ -49,6 +49,27 @@ export class ClientRepository implements ClientRepositoryPort {
     );
   }
 
+  async findAll(): Promise<ClientAppEntity[]> {
+    const clients = await this.prisma.clientApp.findMany();
+
+    return clients.map(
+      (client) =>
+        new ClientAppEntity(
+          client.id,
+          client.clientId,
+          client.clientSecret,
+          client.appName,
+          client.role as ClientRole,
+          client.authorities,
+          client.redirectUris,
+          client.allowedGrantTypes as GrantType[],
+          client.createdAt,
+          client.updatedAt,
+          client.description || undefined,
+        ),
+    );
+  }
+
   async save(clientEntity: ClientAppEntity): Promise<ClientAppEntity> {
     const client = await this.prisma.clientApp.upsert({
       where: { clientId: clientEntity.clientId },

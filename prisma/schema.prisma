@@ -56,6 +56,9 @@ model User {
     authCodes     AuthorizationCode[]
     refreshTokens RefreshToken[]
 
+    // Email verification
+    emailVerificationTokens EmailVerificationToken[]
+
     @@map("users")
 }
 
@@ -68,6 +71,17 @@ model UserProfile {
     birthDate DateTime?
 
     @@map("user_profiles")
+}
+
+model EmailVerificationToken {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    token     String   @unique
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+
+    @@map("email_verification_tokens")
 }
 
 // --- CLIENT APPLICATION (The Admin/Service) ---
