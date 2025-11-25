@@ -89,6 +89,7 @@ export class UserRepository implements UserRepositoryPort {
   async updateProfile(userId: string, data: {
     givenName?: string;
     familyName?: string;
+    fullName?: string;
     picture?: string;
     avatarUrl?: string;
     locale?: string;
@@ -105,6 +106,7 @@ export class UserRepository implements UserRepositoryPort {
         userId,
         givenName: data.givenName,
         familyName: data.familyName,
+        fullName: data.fullName,
         picture: data.picture,
         avatarUrl: data.avatarUrl,
         locale: data.locale,
@@ -114,6 +116,7 @@ export class UserRepository implements UserRepositoryPort {
       update: {
         ...(data.givenName !== undefined && { givenName: data.givenName }),
         ...(data.familyName !== undefined && { familyName: data.familyName }),
+        ...(data.fullName !== undefined && { fullName: data.fullName }),
         ...(data.picture !== undefined && { picture: data.picture }),
         ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
         ...(data.locale !== undefined && { locale: data.locale }),

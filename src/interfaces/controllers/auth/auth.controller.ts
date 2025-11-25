@@ -42,8 +42,15 @@ export class AuthController {
     const command = new RegisterUserCommand(
       request.email,
       request.password,
-      request.username,
       request.phoneNumber,
+      request.givenName,
+      request.familyName,
+      request.fullName,
+      request.picture,
+      request.avatarUrl,
+      request.locale,
+      request.timezone,
+      request.birthDate,
     );
     return this.commandBus.execute(command);
   }

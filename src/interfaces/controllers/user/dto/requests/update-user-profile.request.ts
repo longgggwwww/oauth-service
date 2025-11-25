@@ -10,6 +10,10 @@ export class UpdateUserProfileRequest {
     familyName?: string;
 
     @IsOptional()
+    @IsString()
+    fullName?: string;
+
+    @IsOptional()
     @IsUrl()
     picture?: string;
 

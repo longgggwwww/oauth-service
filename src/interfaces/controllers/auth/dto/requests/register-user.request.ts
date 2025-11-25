@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsUrl, IsDateString } from 'class-validator';
 
 export class RegisterUserRequest {
     @IsEmail()
@@ -10,10 +10,38 @@ export class RegisterUserRequest {
 
     @IsOptional()
     @IsString()
-    username?: string;
+    phoneNumber?: string;
+
+    // Profile fields (optional)
+    @IsOptional()
+    @IsString()
+    givenName?: string;
 
     @IsOptional()
     @IsString()
-    phoneNumber?: string;
-}
+    familyName?: string;
 
+    @IsOptional()
+    @IsString()
+    fullName?: string;
+
+    @IsOptional()
+    @IsUrl()
+    picture?: string;
+
+    @IsOptional()
+    @IsUrl()
+    avatarUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    locale?: string;
+
+    @IsOptional()
+    @IsString()
+    timezone?: string;
+
+    @IsOptional()
+    @IsDateString()
+    birthDate?: string;
+}

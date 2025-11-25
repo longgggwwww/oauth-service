@@ -20,7 +20,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
     ) { }
 
     async execute(command: RegisterUserCommand): Promise<any> {
-        const { email, password, username, phoneNumber } = command;
+        const { email, password, phoneNumber, givenName, familyName, fullName, picture, avatarUrl, locale, timezone, birthDate } = command;
 
         // 1. Check if user already exists
         const existingUser = await this.userRepository.findByEmail(email);
@@ -51,6 +51,20 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
                 }
             }
 
+            // Update profile if any profile fields provided
+            if (givenName || familyName || fullName || picture || avatarUrl || locale || timezone || birthDate) {
+                await this.userRepository.updateProfile(existingUser.id, {
+                    givenName,
+                    familyName,
+                    fullName,
+                    picture,
+                    avatarUrl,
+                    locale,
+                    timezone,
+                    birthDate,
+                });
+            }
+
             // Delete old verification tokens
             await this.emailVerificationTokenRepository.deleteByUserId(existingUser.id);
 
@@ -67,7 +81,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
             // Send verification email
             try {
-                await this.emailService.sendVerificationEmail(email, verificationToken, username);
+                await this.emailService.sendVerificationEmail(email, verificationToken, givenName || fullName);
             } catch (error) {
                 console.error('Failed to send verification email:', error);
             }
@@ -99,9 +113,18 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
             passwordHash,
         });
 
-        // 6. Create user profile if username provided
-        if (username) {
-            await this.userRepository.createProfile(user.id, { fullName: username });
+        // 6. Create user profile with all provided fields
+        if (givenName || familyName || fullName || picture || avatarUrl || locale || timezone || birthDate) {
+            await this.userRepository.updateProfile(user.id, {
+                givenName,
+                familyName,
+                fullName,
+                picture,
+                avatarUrl,
+                locale,
+                timezone,
+                birthDate,
+            });
         }
 
         // 7. Generate verification token
@@ -117,7 +140,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
         // 8. Send verification email
         try {
-            await this.emailService.sendVerificationEmail(email, verificationToken, username);
+            await this.emailService.sendVerificationEmail(email, verificationToken, givenName || fullName);
         } catch (error) {
             console.error('Failed to send verification email:', error);
             // Don't fail registration if email sends fails

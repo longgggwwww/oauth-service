@@ -29,6 +29,7 @@ export class UpdateUserProfileHandler implements ICommandHandler<UpdateUserProfi
             phoneNumber: updatedUser.phoneNumber,
             givenName: updatedUser.profile?.givenName,
             familyName: updatedUser.profile?.familyName,
+            fullName: updatedUser.profile?.fullName,
             picture: updatedUser.profile?.picture,
             avatarUrl: updatedUser.profile?.avatarUrl,
             locale: updatedUser.profile?.locale,

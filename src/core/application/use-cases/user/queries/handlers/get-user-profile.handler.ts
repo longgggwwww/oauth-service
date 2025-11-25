@@ -22,6 +22,7 @@ export class GetUserProfileHandler implements IQueryHandler<GetUserProfileQuery>
             phoneNumber: userWithProfile.phoneNumber,
             givenName: userWithProfile.profile?.givenName,
             familyName: userWithProfile.profile?.familyName,
+            fullName: userWithProfile.profile?.fullName,
             picture: userWithProfile.profile?.picture,
             avatarUrl: userWithProfile.profile?.avatarUrl,
             locale: userWithProfile.profile?.locale,
