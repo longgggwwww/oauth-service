@@ -55,6 +55,12 @@ export class AuthenticateHandler
       throw new UserNotFoundException(email);
     }
 
+    // 1.a Fetch user profile (if any) so we can include it in the response
+    const userWithProfile = await this.userRepository.getProfileWithUser(
+      user.id,
+    );
+    const profile = userWithProfile?.profile || null;
+
     // 2. Get password credential
     const credential = await this.passwordCredentialRepository.findByUserId(
       user.id,
@@ -103,6 +109,22 @@ export class AuthenticateHandler
       user: {
         id: user.id,
         email: user.email,
+        phoneNumber: user.phoneNumber,
+        profile: profile
+          ? {
+              givenName: profile.givenName || undefined,
+              familyName: profile.familyName || undefined,
+              fullName: profile.fullName || undefined,
+              picture: profile.picture || undefined,
+              avatarUrl: profile.avatarUrl || undefined,
+              locale: profile.locale || undefined,
+              timezone: profile.timezone || undefined,
+              birthDate: profile.birthDate
+                ? // normalize Date -> YYYY-MM-DD string where appropriate
+                  new Date(profile.birthDate).toISOString().split('T')[0]
+                : undefined,
+            }
+          : undefined,
       },
     };
   }

@@ -17,7 +17,7 @@ export class UserController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getMe(@CurrentUser() user: JwtPayload): Promise<UserProfileResponse> {
+  async getMe(@CurrentUser() user: JwtPayload): Promise<any> {
     if (!user.sub) {
       throw new Error(
         'User ID not found in token. This endpoint requires user authentication, not client credentials.',
@@ -25,7 +25,23 @@ export class UserController {
     }
     const query = new GetUserProfileQuery(user.sub);
     const profile = await this.queryBus.execute(query);
-    return UserProfileResponse.fromEntity(profile);
+    return {
+      id: profile.id,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+      profile: {
+        givenName: profile.givenName || undefined,
+        familyName: profile.familyName || undefined,
+        fullName: profile.fullName || undefined,
+        picture: profile.picture || undefined,
+        avatarUrl: profile.avatarUrl || undefined,
+        locale: profile.locale || undefined,
+        timezone: profile.timezone || undefined,
+        birthDate: profile.birthDate
+          ? new Date(profile.birthDate).toISOString().split('T')[0]
+          : undefined,
+      },
+    };
   }
 
   @Put('me')
@@ -33,7 +49,7 @@ export class UserController {
   async updateMe(
     @Body() updateDto: UpdateUserProfileRequest,
     @CurrentUser() user: JwtPayload,
-  ): Promise<UserProfileResponse> {
+  ): Promise<any> {
     if (!user.sub) {
       throw new Error(
         'User ID not found in token. This endpoint requires user authentication, not client credentials.',
@@ -41,7 +57,23 @@ export class UserController {
     }
     const command = new UpdateUserProfileCommand(user.sub, updateDto);
     const profile = await this.commandBus.execute(command);
-    return UserProfileResponse.fromEntity(profile);
+    return {
+      id: profile.id,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+      profile: {
+        givenName: profile.givenName || undefined,
+        familyName: profile.familyName || undefined,
+        fullName: profile.fullName || undefined,
+        picture: profile.picture || undefined,
+        avatarUrl: profile.avatarUrl || undefined,
+        locale: profile.locale || undefined,
+        timezone: profile.timezone || undefined,
+        birthDate: profile.birthDate
+          ? new Date(profile.birthDate).toISOString().split('T')[0]
+          : undefined,
+      },
+    };
   }
 
   @Get(':id')
@@ -49,7 +81,7 @@ export class UserController {
   async getUser(
     @Param('id') id: string,
     @CurrentUser() user: JwtPayload,
-  ): Promise<UserProfileResponse> {
+  ): Promise<any> {
     // Allow access if user is requesting their own profile or if they have admin authority
     if (user.sub !== id && !user.authorities?.includes('user:read')) {
       throw new Error(
@@ -58,6 +90,22 @@ export class UserController {
     }
     const query = new GetUserProfileQuery(id);
     const profile = await this.queryBus.execute(query);
-    return UserProfileResponse.fromEntity(profile);
+    return {
+      id: profile.id,
+      email: profile.email,
+      phoneNumber: profile.phoneNumber,
+      profile: {
+        givenName: profile.givenName || undefined,
+        familyName: profile.familyName || undefined,
+        fullName: profile.fullName || undefined,
+        picture: profile.picture || undefined,
+        avatarUrl: profile.avatarUrl || undefined,
+        locale: profile.locale || undefined,
+        timezone: profile.timezone || undefined,
+        birthDate: profile.birthDate
+          ? new Date(profile.birthDate).toISOString().split('T')[0]
+          : undefined,
+      },
+    };
   }
 }
