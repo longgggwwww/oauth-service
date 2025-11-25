@@ -111,8 +111,15 @@ export class UserRepository implements UserRepositoryPort {
       ? new Date(data.birthDate)
       : undefined;
 
+    console.log(`[UserRepository] Upserting profile for userId: ${userId}`, {
+      data: {
+        ...data,
+        birthDate: birthDateValue,
+      },
+    });
+
     // Upsert profile (create if not exists, update if exists)
-    return this.prisma.userProfile.upsert({
+    const profile = await this.prisma.userProfile.upsert({
       where: { userId },
       create: {
         userId,
@@ -136,6 +143,13 @@ export class UserRepository implements UserRepositoryPort {
         ...(data.birthDate !== undefined && { birthDate: birthDateValue }),
       },
     });
+
+    console.log(
+      `[UserRepository] Profile upserted successfully for userId: ${userId}`,
+      { profileId: profile.id },
+    );
+
+    return profile;
   }
 
   async updateStatus(userId: string, status: string): Promise<void> {
