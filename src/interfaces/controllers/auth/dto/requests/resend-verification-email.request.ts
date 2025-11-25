@@ -1,6 +1,6 @@
 import { IsEmail } from 'class-validator';
 
 export class ResendVerificationEmailRequest {
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 }

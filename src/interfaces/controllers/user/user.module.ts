@@ -8,12 +8,8 @@ import { UpdateUserProfileHandler } from '@src/core/application/use-cases/user/c
 import { UserRepository } from '@src/infrastructure/persistence/prisma/repositories/user.repository';
 
 @Module({
-    imports: [CqrsModule, OauthModule, PrismaModule],
-    controllers: [UserController],
-    providers: [
-        GetUserProfileHandler,
-        UpdateUserProfileHandler,
-        UserRepository,
-    ],
+  imports: [CqrsModule, OauthModule, PrismaModule],
+  controllers: [UserController],
+  providers: [GetUserProfileHandler, UpdateUserProfileHandler, UserRepository],
 })
-export class UserModule { }
+export class UserModule {}

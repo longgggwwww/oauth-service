@@ -1,47 +1,48 @@
-import { IsEmail, IsString, IsOptional, MinLength, IsUrl, IsDateString } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsOptional,
+  MinLength,
+  IsUrl,
+  IsDateString,
+} from 'class-validator';
 
 export class RegisterUserRequest {
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    @MinLength(8, { message: 'Password must be at least 8 characters long' })
-    password: string;
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  password: string;
 
-    @IsOptional()
-    @IsString()
-    phoneNumber?: string;
+  @IsString()
+  phoneNumber: string;
 
-    // Profile fields (optional)
-    @IsOptional()
-    @IsString()
-    givenName?: string;
+  // Profile fields (optional)
+  @IsString()
+  givenName?: string;
 
-    @IsOptional()
-    @IsString()
-    familyName?: string;
+  @IsString()
+  familyName?: string;
 
-    @IsOptional()
-    @IsString()
-    fullName?: string;
+  @IsString()
+  fullName: string;
 
-    @IsOptional()
-    @IsUrl()
-    picture?: string;
+  @IsUrl()
+  picture?: string;
 
-    @IsOptional()
-    @IsUrl()
-    avatarUrl?: string;
+  @IsUrl()
+  avatarUrl?: string;
 
-    @IsOptional()
-    @IsString()
-    locale?: string;
+  @IsOptional()
+  @IsString()
+  locale?: string;
 
-    @IsOptional()
-    @IsString()
-    timezone?: string;
+  @IsOptional()
+  @IsString()
+  timezone?: string;
 
-    @IsOptional()
-    @IsDateString()
-    birthDate?: string;
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
 }

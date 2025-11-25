@@ -1,3 +1,3 @@
 export class GetUserInfoQuery {
-    constructor(public readonly accessToken: string) { }
+  constructor(public readonly accessToken: string) {}
 }

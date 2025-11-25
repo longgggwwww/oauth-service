@@ -165,7 +165,6 @@ export class ExchangeTokenHandler
 
   /**
    * Authorization Code Flow
-   * TODO: Implement when authorization code logic is ready
    */
   private async handleAuthorizationCode(
     request: any,

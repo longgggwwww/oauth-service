@@ -6,23 +6,22 @@ import type { ClientRepositoryPort } from '@src/core/application/ports/repositor
 import type { ClientSummary } from '@src/core/shared/types';
 
 @QueryHandler(GetAllClientsQuery)
-export class GetAllClientsHandler
-    implements IQueryHandler<GetAllClientsQuery> {
-    constructor(
-        @Inject('ClientRepositoryPort')
-        private readonly clientRepository: ClientRepositoryPort,
-    ) { }
+export class GetAllClientsHandler implements IQueryHandler<GetAllClientsQuery> {
+  constructor(
+    @Inject('ClientRepositoryPort')
+    private readonly clientRepository: ClientRepositoryPort,
+  ) {}
 
-    async execute(query: GetAllClientsQuery): Promise<ClientSummary[]> {
-        const clients = await this.clientRepository.findAll();
+  async execute(query: GetAllClientsQuery): Promise<ClientSummary[]> {
+    const clients = await this.clientRepository.findAll();
 
-        return clients.map((client) => ({
-            id: client.id,
-            clientId: client.clientId,
-            name: client.appName,
-            redirectUris: client.redirectUris,
-            createdAt: client.createdAt,
-            updatedAt: client.updatedAt,
-        }));
-    }
+    return clients.map((client) => ({
+      id: client.id,
+      clientId: client.clientId,
+      name: client.appName,
+      redirectUris: client.redirectUris,
+      createdAt: client.createdAt,
+      updatedAt: client.updatedAt,
+    }));
+  }
 }

@@ -25,7 +25,6 @@ import { ClientCredentialsGuard } from '@src/infrastructure/common/guards/client
 import { JwtAuthGuard } from '@src/infrastructure/common/guards/jwt-auth.guard';
 import { CurrentUser } from '@src/infrastructure/common/decorators/current-user.decorator';
 
-
 /**
  * AuthController
  * Handles Identity Provider (IdP) session management.
@@ -34,18 +33,18 @@ import { CurrentUser } from '@src/infrastructure/common/decorators/current-user.
  */
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly commandBus: CommandBus) { }
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Post('register')
   @UseGuards(ClientCredentialsGuard)
   async register(@Body() request: RegisterUserRequest) {
     const command = new RegisterUserCommand(
       request.email,
-      request.password,
       request.phoneNumber,
+      request.fullName,
+      request.password,
       request.givenName,
       request.familyName,
-      request.fullName,
       request.picture,
       request.avatarUrl,
       request.locale,
@@ -87,7 +86,9 @@ export class AuthController {
     // Extract userId from JWT token
     const userId = user.sub;
     if (!userId) {
-      throw new BadRequestException('User ID not found in token. This endpoint requires user authentication, not client credentials.');
+      throw new BadRequestException(
+        'User ID not found in token. This endpoint requires user authentication, not client credentials.',
+      );
     }
     const command = new LogoutCommand(userId);
     await this.commandBus.execute(command);

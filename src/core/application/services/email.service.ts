@@ -4,45 +4,58 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
-    private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter;
 
-    constructor(private configService: ConfigService) {
-        // Configure SMTP transporter
-        this.transporter = nodemailer.createTransport({
-            host: this.configService.get('SMTP_HOST', 'smtp.gmail.com'),
-            port: this.configService.get('SMTP_PORT', 587),
-            secure: this.configService.get('SMTP_SECURE', 'false') === 'true',
-            auth: {
-                user: this.configService.get('SMTP_USER'),
-                pass: this.configService.get('SMTP_PASSWORD'),
-            },
-        });
+  constructor(private configService: ConfigService) {
+    // Configure SMTP transporter
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get('SMTP_HOST', 'smtp.gmail.com'),
+      port: this.configService.get('SMTP_PORT', 587),
+      secure: this.configService.get('SMTP_SECURE', 'false') === 'true',
+      auth: {
+        user: this.configService.get('SMTP_USER'),
+        pass: this.configService.get('SMTP_PASSWORD'),
+      },
+    });
+  }
+
+  async sendVerificationEmail(
+    email: string,
+    token: string,
+    username?: string,
+  ): Promise<void> {
+    const backendUrl = this.configService.get(
+      'BACKEND_URL',
+      'http://localhost:3000',
+    );
+    const verificationUrl = `${backendUrl}/v1/auth/verify-email?token=${token}`;
+
+    const emailFrom = this.configService.get(
+      'EMAIL_FROM',
+      'noreply@oauth-service.com',
+    );
+
+    const mailOptions = {
+      from: emailFrom,
+      to: email,
+      subject: 'Verify Your Email Address',
+      html: this.getVerificationEmailTemplate(verificationUrl, username),
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Verification email sent to ${email}`);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new Error('Failed to send verification email');
     }
+  }
 
-    async sendVerificationEmail(email: string, token: string, username?: string): Promise<void> {
-        const backendUrl = this.configService.get('BACKEND_URL', 'http://localhost:3000');
-        const verificationUrl = `${backendUrl}/v1/auth/verify-email?token=${token}`;
-
-        const emailFrom = this.configService.get('EMAIL_FROM', 'noreply@oauth-service.com');
-
-        const mailOptions = {
-            from: emailFrom,
-            to: email,
-            subject: 'Verify Your Email Address',
-            html: this.getVerificationEmailTemplate(verificationUrl, username),
-        };
-
-        try {
-            await this.transporter.sendMail(mailOptions);
-            console.log(`Verification email sent to ${email}`);
-        } catch (error) {
-            console.error('Error sending verification email:', error);
-            throw new Error('Failed to send verification email');
-        }
-    }
-
-    private getVerificationEmailTemplate(verificationUrl: string, username?: string): string {
-        return `
+  private getVerificationEmailTemplate(
+    verificationUrl: string,
+    username?: string,
+  ): string {
+    return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -129,5 +142,5 @@ export class EmailService {
 </body>
 </html>
         `;
-    }
+  }
 }

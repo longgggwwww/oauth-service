@@ -19,4 +19,4 @@ import { ConfigService } from '@nestjs/config';
   ],
   exports: [PrismaClient],
 })
-export class PrismaModule { }
+export class PrismaModule {}

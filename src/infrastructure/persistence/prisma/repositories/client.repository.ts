@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { ClientAppEntity, ClientRole, GrantType } from '@src/core/domain/entities/client.entity';
+import {
+  ClientAppEntity,
+  ClientRole,
+  GrantType,
+} from '@src/core/domain/entities/client.entity';
 import { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
 
 @Injectable()
 export class ClientRepository implements ClientRepositoryPort {
-  constructor(private readonly prisma: PrismaClient) { }
+  constructor(private readonly prisma: PrismaClient) {}
 
   async findByClientId(clientId: string): Promise<ClientAppEntity | null> {
     const client = await this.prisma.clientApp.findUnique({
@@ -25,6 +29,7 @@ export class ClientRepository implements ClientRepositoryPort {
       client.createdAt,
       client.updatedAt,
       client.description || undefined,
+      client.ownerId || undefined,
     );
   }
 
@@ -46,6 +51,31 @@ export class ClientRepository implements ClientRepositoryPort {
       client.createdAt,
       client.updatedAt,
       client.description || undefined,
+      client.ownerId || undefined,
+    );
+  }
+
+  async findByOwnerId(ownerId: string): Promise<ClientAppEntity[]> {
+    const clients = await this.prisma.clientApp.findMany({
+      where: { ownerId },
+    });
+
+    return clients.map(
+      (client) =>
+        new ClientAppEntity(
+          client.id,
+          client.clientId,
+          client.clientSecret,
+          client.appName,
+          client.role as ClientRole,
+          client.authorities,
+          client.redirectUris,
+          client.allowedGrantTypes as GrantType[],
+          client.createdAt,
+          client.updatedAt,
+          client.description || undefined,
+          client.ownerId || undefined,
+        ),
     );
   }
 
@@ -66,6 +96,7 @@ export class ClientRepository implements ClientRepositoryPort {
           client.createdAt,
           client.updatedAt,
           client.description || undefined,
+          client.ownerId || undefined,
         ),
     );
   }
@@ -79,6 +110,7 @@ export class ClientRepository implements ClientRepositoryPort {
         clientSecret: clientEntity.clientSecret,
         appName: clientEntity.appName,
         description: clientEntity.description,
+        ownerId: clientEntity.ownerId,
         role: clientEntity.role,
         authorities: clientEntity.authorities,
         redirectUris: clientEntity.redirectUris,
@@ -88,6 +120,7 @@ export class ClientRepository implements ClientRepositoryPort {
         clientSecret: clientEntity.clientSecret,
         appName: clientEntity.appName,
         description: clientEntity.description,
+        ownerId: clientEntity.ownerId,
         role: clientEntity.role,
         authorities: clientEntity.authorities,
         redirectUris: clientEntity.redirectUris,
@@ -107,6 +140,7 @@ export class ClientRepository implements ClientRepositoryPort {
       client.createdAt,
       client.updatedAt,
       client.description || undefined,
+      client.ownerId || undefined,
     );
   }
 

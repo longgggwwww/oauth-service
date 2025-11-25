@@ -10,45 +10,54 @@ import type { JwtPayload } from '@src/core/application/services/token.service';
 
 @Controller('users')
 export class UserController {
-    constructor(
-        private readonly commandBus: CommandBus,
-        private readonly queryBus: QueryBus,
-    ) { }
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
-    @Get('me')
-    @UseGuards(JwtAuthGuard)
-    async getMe(@CurrentUser() user: JwtPayload): Promise<UserProfileResponse> {
-        if (!user.sub) {
-            throw new Error('User ID not found in token. This endpoint requires user authentication, not client credentials.');
-        }
-        const query = new GetUserProfileQuery(user.sub);
-        const profile = await this.queryBus.execute(query);
-        return UserProfileResponse.fromEntity(profile);
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@CurrentUser() user: JwtPayload): Promise<UserProfileResponse> {
+    if (!user.sub) {
+      throw new Error(
+        'User ID not found in token. This endpoint requires user authentication, not client credentials.',
+      );
     }
+    const query = new GetUserProfileQuery(user.sub);
+    const profile = await this.queryBus.execute(query);
+    return UserProfileResponse.fromEntity(profile);
+  }
 
-    @Put('me')
-    @UseGuards(JwtAuthGuard)
-    async updateMe(
-        @Body() updateDto: UpdateUserProfileRequest,
-        @CurrentUser() user: JwtPayload
-    ): Promise<UserProfileResponse> {
-        if (!user.sub) {
-            throw new Error('User ID not found in token. This endpoint requires user authentication, not client credentials.');
-        }
-        const command = new UpdateUserProfileCommand(user.sub, updateDto);
-        const profile = await this.commandBus.execute(command);
-        return UserProfileResponse.fromEntity(profile);
+  @Put('me')
+  @UseGuards(JwtAuthGuard)
+  async updateMe(
+    @Body() updateDto: UpdateUserProfileRequest,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<UserProfileResponse> {
+    if (!user.sub) {
+      throw new Error(
+        'User ID not found in token. This endpoint requires user authentication, not client credentials.',
+      );
     }
+    const command = new UpdateUserProfileCommand(user.sub, updateDto);
+    const profile = await this.commandBus.execute(command);
+    return UserProfileResponse.fromEntity(profile);
+  }
 
-    @Get(':id')
-    @UseGuards(JwtAuthGuard)
-    async getUser(@Param('id') id: string, @CurrentUser() user: JwtPayload): Promise<UserProfileResponse> {
-        // Allow access if user is requesting their own profile or if they have admin authority
-        if (user.sub !== id && !user.authorities?.includes('user:read')) {
-            throw new Error('Forbidden: You can only access your own profile or need user:read authority');
-        }
-        const query = new GetUserProfileQuery(id);
-        const profile = await this.queryBus.execute(query);
-        return UserProfileResponse.fromEntity(profile);
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getUser(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<UserProfileResponse> {
+    // Allow access if user is requesting their own profile or if they have admin authority
+    if (user.sub !== id && !user.authorities?.includes('user:read')) {
+      throw new Error(
+        'Forbidden: You can only access your own profile or need user:read authority',
+      );
     }
+    const query = new GetUserProfileQuery(id);
+    const profile = await this.queryBus.execute(query);
+    return UserProfileResponse.fromEntity(profile);
+  }
 }

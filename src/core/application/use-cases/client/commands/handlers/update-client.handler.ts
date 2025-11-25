@@ -8,11 +8,12 @@ import { ClientNotFoundException } from '@src/core/domain/exceptions/domain.exce
 
 @CommandHandler(UpdateClientCommand)
 export class UpdateClientHandler
-  implements ICommandHandler<UpdateClientCommand> {
+  implements ICommandHandler<UpdateClientCommand>
+{
   constructor(
     @Inject('ClientRepositoryPort')
     private readonly clientRepository: ClientRepositoryPort,
-  ) { }
+  ) {}
 
   async execute(command: UpdateClientCommand): Promise<ClientAppEntity> {
     const client = await this.clientRepository.findById(command.clientId);

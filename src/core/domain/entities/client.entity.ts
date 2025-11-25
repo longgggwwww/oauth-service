@@ -18,6 +18,7 @@ export class ClientAppEntity {
   clientSecret: string;
   appName: string;
   description?: string;
+  ownerId?: string;
   role: ClientRole;
   authorities: string[];
   redirectUris: string[];
@@ -37,6 +38,7 @@ export class ClientAppEntity {
     createdAt: Date,
     updatedAt: Date,
     description?: string,
+    ownerId?: string,
   ) {
     this.id = id;
     this.clientId = clientId;
@@ -49,6 +51,7 @@ export class ClientAppEntity {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.description = description;
+    this.ownerId = ownerId;
   }
 
   static create(
@@ -60,6 +63,7 @@ export class ClientAppEntity {
     role: ClientRole = ClientRole.THIRD_PARTY_APP,
     authorities: string[] = [],
     description?: string,
+    ownerId?: string,
   ): ClientAppEntity {
     return new ClientAppEntity(
       randomUUID(),
@@ -73,6 +77,7 @@ export class ClientAppEntity {
       new Date(),
       new Date(),
       description,
+      ownerId,
     );
   }
 

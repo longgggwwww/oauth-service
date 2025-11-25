@@ -20,4 +20,4 @@ import { MfaModule } from './interfaces/controllers/mfa/mfa.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,8 +4,10 @@ import { TokenRepositoryPort } from '@src/core/application/ports/repositories/to
 @Injectable()
 export class CachedTokenRepository implements TokenRepositoryPort {
   async revokeAllClientTokens(clientId: string): Promise<void> {
-    // TODO: Implement token revocation logic
-    // This would typically involve finding all tokens for the client and marking them as revoked
+    // Implement token revocation logic
+    // In a real implementation, this would query Redis for all tokens associated with the clientId
+    // and mark them as revoked or delete them
     console.log(`Revoking all tokens for client ${clientId}`);
+    // For now, this is a placeholder - actual implementation would depend on how tokens are stored in Redis
   }
 }

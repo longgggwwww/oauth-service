@@ -1,4 +1,4 @@
 export class MfaSetupResponse {
-    secret: string;
-    qrCodeUrl?: string;
+  secret: string;
+  qrCodeUrl?: string;
 }

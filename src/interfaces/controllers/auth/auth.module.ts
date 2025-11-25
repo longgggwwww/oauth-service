@@ -43,4 +43,4 @@ import { ClientRepository } from '@src/infrastructure/persistence/prisma/reposit
     AuthSessionRepository,
   ],
 })
-export class AuthModule { }
+export class AuthModule {}

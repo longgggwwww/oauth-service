@@ -44,6 +44,9 @@ model User {
     createdViaClientId String?
     createdViaClient   ClientApp? @relation("ClientCreatedUsers", fields: [createdViaClientId], references: [id])
 
+    // Clients owned by this user
+    ownedClients ClientApp[] @relation("UserOwnedClients")
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -97,6 +100,7 @@ model ClientApp {
     clientSecret String // Hash (Bcrypt/Argon2)
     appName      String
     description  String?
+    ownerId      String?
 
     // Role xác định Client này có quyền quản trị hay không
     role ClientRole @default(THIRD_PARTY_APP)
@@ -112,6 +116,9 @@ model ClientApp {
     // Relations
     // Client này đã tạo ra những user nào?
     createdUsers User[] @relation("ClientCreatedUsers")
+
+    // Owner of this client
+    owner User? @relation("UserOwnedClients", fields: [ownerId], references: [id])
 
     // Tokens do Client này sở hữu (khi dùng Client Credentials flow)
     issuedRefreshTokens RefreshToken[]

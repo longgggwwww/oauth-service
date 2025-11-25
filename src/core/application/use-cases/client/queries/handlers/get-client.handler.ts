@@ -11,7 +11,7 @@ export class GetClientHandler implements IQueryHandler<GetClientQuery> {
   constructor(
     @Inject('ClientRepositoryPort')
     private readonly clientRepository: ClientRepositoryPort,
-  ) { }
+  ) {}
 
   async execute(query: GetClientQuery): Promise<ClientAppEntity> {
     const client = await this.clientRepository.findById(query.clientId);

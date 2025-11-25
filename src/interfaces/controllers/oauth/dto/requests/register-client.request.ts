@@ -1,7 +1,6 @@
 import { IsString, IsArray, IsOptional, IsUrl, IsUUID } from 'class-validator';
 
 export class RegisterClientRequest {
-
   @IsString()
   name: string;
 

@@ -5,7 +5,7 @@ import { UserRepositoryPort } from '@src/core/application/ports/repositories/use
 
 @Injectable()
 export class UserRepository implements UserRepositoryPort {
-  constructor(private readonly prisma: PrismaClient) { }
+  constructor(private readonly prisma: PrismaClient) {}
 
   async findById(id: string): Promise<UserAggregate | null> {
     const user = await this.prisma.user.findUnique({
@@ -57,7 +57,11 @@ export class UserRepository implements UserRepositoryPort {
     });
   }
 
-  async create(data: { email: string; phoneNumber?: string; status: string }): Promise<any> {
+  async create(data: {
+    email: string;
+    phoneNumber?: string;
+    status: string;
+  }): Promise<any> {
     return this.prisma.user.create({
       data: {
         email: data.email,
@@ -67,7 +71,10 @@ export class UserRepository implements UserRepositoryPort {
     });
   }
 
-  async createProfile(userId: string, data: { fullName?: string }): Promise<any> {
+  async createProfile(
+    userId: string,
+    data: { fullName?: string },
+  ): Promise<any> {
     return this.prisma.userProfile.create({
       data: {
         userId,
@@ -86,18 +93,23 @@ export class UserRepository implements UserRepositoryPort {
     return user;
   }
 
-  async updateProfile(userId: string, data: {
-    givenName?: string;
-    familyName?: string;
-    fullName?: string;
-    picture?: string;
-    avatarUrl?: string;
-    locale?: string;
-    timezone?: string;
-    birthDate?: string;
-  }): Promise<any> {
+  async updateProfile(
+    userId: string,
+    data: {
+      givenName?: string;
+      familyName?: string;
+      fullName?: string;
+      picture?: string;
+      avatarUrl?: string;
+      locale?: string;
+      timezone?: string;
+      birthDate?: string;
+    },
+  ): Promise<any> {
     // Convert birthDate string to Date if provided
-    const birthDateValue = data.birthDate ? new Date(data.birthDate) : undefined;
+    const birthDateValue = data.birthDate
+      ? new Date(data.birthDate)
+      : undefined;
 
     // Upsert profile (create if not exists, update if exists)
     return this.prisma.userProfile.upsert({

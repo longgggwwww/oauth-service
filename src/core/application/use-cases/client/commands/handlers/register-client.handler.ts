@@ -1,22 +1,34 @@
 import { Inject } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { RegisterClientCommand } from '../register-client.command';
-import { ClientAppEntity, ClientRole, GrantType } from '@src/core/domain/entities/client.entity';
+import {
+  ClientAppEntity,
+  ClientRole,
+  GrantType,
+} from '@src/core/domain/entities/client.entity';
 import type { ClientRepositoryPort } from '@src/core/application/ports/repositories/client-repository.port';
 import { CryptoService } from '@src/core/application/services/crypto.service';
+import { ClientRegisteredEvent } from '@src/core/domain/events/client-registered.event';
 
 @CommandHandler(RegisterClientCommand)
 export class RegisterClientHandler
-  implements ICommandHandler<RegisterClientCommand> {
+  implements ICommandHandler<RegisterClientCommand>
+{
   constructor(
     @Inject('ClientRepositoryPort')
     private readonly clientRepo: ClientRepositoryPort,
     private readonly cryptoService: CryptoService,
-  ) { }
+    private readonly eventBus: EventBus,
+  ) {}
 
-  async execute(command: RegisterClientCommand): Promise<{ client: ClientAppEntity; plainSecret: string }> {
+  async execute(
+    command: RegisterClientCommand,
+  ): Promise<{ client: ClientAppEntity; plainSecret: string }> {
     try {
-      console.log('[RegisterClientHandler] Starting client registration:', command.name);
+      console.log(
+        '[RegisterClientHandler] Starting client registration:',
+        command.name,
+      );
 
       // Generate client ID and secret
       const clientId = this.cryptoService.generateClientId();
@@ -32,9 +44,14 @@ export class RegisterClientHandler
       }
 
       // Map grant types with proper defaults
-      const grantTypes = command.grantTypes && command.grantTypes.length > 0
-        ? command.grantTypes.map(gt => gt.toUpperCase()).filter(gt => Object.values(GrantType).includes(gt as GrantType)) as GrantType[]
-        : [GrantType.AUTHORIZATION_CODE];
+      const grantTypes =
+        command.grantTypes && command.grantTypes.length > 0
+          ? (command.grantTypes
+              .map((gt) => gt.toUpperCase())
+              .filter((gt) =>
+                Object.values(GrantType).includes(gt as GrantType),
+              ) as GrantType[])
+          : [GrantType.AUTHORIZATION_CODE];
 
       console.log('[RegisterClientHandler] Grant types:', grantTypes);
 
@@ -48,6 +65,7 @@ export class RegisterClientHandler
         ClientRole.THIRD_PARTY_APP,
         [], // authorities - can be extended via command if needed
         command.description,
+        command.ownerId,
       );
 
       console.log('[RegisterClientHandler] Saving client to database...');
@@ -55,13 +73,26 @@ export class RegisterClientHandler
       // Save client
       const savedClient = await this.clientRepo.save(client);
 
-      console.log('[RegisterClientHandler] Client saved successfully:', savedClient.clientId);
+      console.log(
+        '[RegisterClientHandler] Client saved successfully:',
+        savedClient.clientId,
+      );
 
-      // TODO: Create and publish ClientRegisteredEvent if needed
+      // Publish ClientRegisteredEvent
+      this.eventBus.publish(
+        new ClientRegisteredEvent(
+          savedClient.clientId,
+          savedClient.ownerId!,
+          savedClient.appName,
+        ),
+      );
 
       return { client: savedClient, plainSecret };
     } catch (error) {
-      console.error('[RegisterClientHandler] Error during registration:', error);
+      console.error(
+        '[RegisterClientHandler] Error during registration:',
+        error,
+      );
       throw error;
     }
   }
