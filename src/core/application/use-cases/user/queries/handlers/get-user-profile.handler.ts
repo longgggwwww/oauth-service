@@ -1,4 +1,5 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common';
 import { GetUserProfileQuery } from '../get-user-profile.query';
 import { UserRepository } from '@src/infrastructure/persistence/prisma/repositories/user.repository';
 
@@ -7,15 +8,25 @@ export class GetUserProfileHandler implements IQueryHandler<GetUserProfileQuery>
     constructor(private readonly userRepository: UserRepository) { }
 
     async execute(query: GetUserProfileQuery) {
-        const user = await this.userRepository.findById(query.userId);
-        if (!user) {
-            throw new Error(`User with ID ${query.userId} not found`);
+        // Get user with profile
+        const userWithProfile = await this.userRepository.getProfileWithUser(query.userId);
+
+        if (!userWithProfile) {
+            throw new NotFoundException(`User with ID ${query.userId} not found`);
         }
 
+        // Return complete profile data
         return {
-            id: user.id,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
+            id: userWithProfile.id,
+            email: userWithProfile.email,
+            phoneNumber: userWithProfile.phoneNumber,
+            givenName: userWithProfile.profile?.givenName,
+            familyName: userWithProfile.profile?.familyName,
+            picture: userWithProfile.profile?.picture,
+            avatarUrl: userWithProfile.profile?.avatarUrl,
+            locale: userWithProfile.profile?.locale,
+            timezone: userWithProfile.profile?.timezone,
+            birthDate: userWithProfile.profile?.birthDate,
         };
     }
 }

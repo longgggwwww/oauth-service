@@ -6,6 +6,7 @@ import { AuthenticateHandler } from '@src/core/application/use-cases/auth/comman
 import { RegisterUserHandler } from '@src/core/application/use-cases/auth/commands/handlers/register-user.handler';
 import { VerifyEmailHandler } from '@src/core/application/use-cases/auth/commands/handlers/verify-email.handler';
 import { ResendVerificationEmailHandler } from '@src/core/application/use-cases/auth/commands/handlers/resend-verification-email.handler';
+import { LogoutHandler } from '@src/core/application/use-cases/auth/commands/handlers/logout.handler';
 import { TokenService } from '@src/core/application/services/token.service';
 import { CryptoService } from '@src/core/application/services/crypto.service';
 import { PrismaModule } from '@src/infrastructure/persistence/prisma/prisma.module';
@@ -13,6 +14,8 @@ import { UserRepository } from '@src/infrastructure/persistence/prisma/repositor
 import { PasswordCredentialRepository } from '@src/infrastructure/persistence/prisma/repositories/password-credential.repository';
 import { EmailVerificationTokenRepository } from '@src/infrastructure/persistence/prisma/repositories/email-verification-token.repository';
 import { EmailService } from '@src/core/application/services/email.service';
+import { RefreshTokenRepository } from '@src/infrastructure/persistence/prisma/repositories/refresh-token.repository';
+import { AuthSessionRepository } from '@src/infrastructure/persistence/prisma/repositories/auth-session.repository';
 
 import { ClientRepository } from '@src/infrastructure/persistence/prisma/repositories/client.repository';
 
@@ -28,6 +31,7 @@ import { ClientRepository } from '@src/infrastructure/persistence/prisma/reposit
     RegisterUserHandler,
     VerifyEmailHandler,
     ResendVerificationEmailHandler,
+    LogoutHandler,
     TokenService,
     CryptoService,
     UserRepository,
@@ -35,6 +39,8 @@ import { ClientRepository } from '@src/infrastructure/persistence/prisma/reposit
     EmailVerificationTokenRepository,
     EmailService,
     ClientRepository,
+    RefreshTokenRepository,
+    AuthSessionRepository,
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

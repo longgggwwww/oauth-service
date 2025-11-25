@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common';
 import { UpdateUserProfileCommand } from '../update-user-profile.command';
 import { UserRepository } from '@src/infrastructure/persistence/prisma/repositories/user.repository';
 
@@ -7,17 +8,33 @@ export class UpdateUserProfileHandler implements ICommandHandler<UpdateUserProfi
     constructor(private readonly userRepository: UserRepository) { }
 
     async execute(command: UpdateUserProfileCommand) {
-        const user = await this.userRepository.findById(command.userId);
+        const { userId, updateDto } = command;
+
+        // 1. Check if user exists
+        const user = await this.userRepository.findById(userId);
         if (!user) {
-            throw new Error(`User with ID ${command.userId} not found`);
+            throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
-        // TODO: Update user profile in database
-        // For now, just return the user data
+        // 2. Update profile (upsert - create if not exists)
+        await this.userRepository.updateProfile(userId, updateDto);
+
+        // 3. Get updated user with profile
+        const updatedUser = await this.userRepository.getProfileWithUser(userId);
+
+        // 4. Return formatted response
         return {
-            id: user.id,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
+            id: updatedUser.id,
+            email: updatedUser.email,
+            phoneNumber: updatedUser.phoneNumber,
+            givenName: updatedUser.profile?.givenName,
+            familyName: updatedUser.profile?.familyName,
+            picture: updatedUser.profile?.picture,
+            avatarUrl: updatedUser.profile?.avatarUrl,
+            locale: updatedUser.profile?.locale,
+            timezone: updatedUser.profile?.timezone,
+            birthDate: updatedUser.profile?.birthDate,
         };
     }
 }
+

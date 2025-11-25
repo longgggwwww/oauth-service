@@ -27,5 +27,5 @@ export class UpdateUserProfileRequest {
 
     @IsOptional()
     @IsDateString()
-    birthDate?: Date;
+    birthDate?: string;
 }

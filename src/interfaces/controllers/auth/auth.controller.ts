@@ -7,6 +7,7 @@ import {
   HttpCode,
   UseGuards,
   Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserRequest } from './dto/requests/register-user.request';
@@ -21,6 +22,9 @@ import { ResendVerificationEmailCommand } from '@src/core/application/use-cases/
 
 import { LogoutCommand } from '@src/core/application/use-cases/auth/commands/logout.command';
 import { ClientCredentialsGuard } from '@src/infrastructure/common/guards/client-credentials.guard';
+import { JwtAuthGuard } from '@src/infrastructure/common/guards/jwt-auth.guard';
+import { CurrentUser } from '@src/infrastructure/common/decorators/current-user.decorator';
+
 
 /**
  * AuthController
@@ -71,10 +75,14 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(204)
-  async logout(@Body() body: { userId: string }) {
-    // In real app, get userId from JWT
-    // TODO: Extract userId from token/guard
-    const command = new LogoutCommand(body.userId);
+  @UseGuards(JwtAuthGuard)
+  async logout(@CurrentUser() user: any) {
+    // Extract userId from JWT token
+    const userId = user.sub;
+    if (!userId) {
+      throw new BadRequestException('User ID not found in token. This endpoint requires user authentication, not client credentials.');
+    }
+    const command = new LogoutCommand(userId);
     await this.commandBus.execute(command);
   }
 }

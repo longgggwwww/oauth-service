@@ -37,7 +37,7 @@ export class AuthSessionRepository {
     }
 
     async delete(id: string): Promise<void> {
-        await this.prisma.authSession.delete({
+        await this.prisma.authSession.deleteMany({
             where: { id },
         });
     }

@@ -76,6 +76,53 @@ export class UserRepository implements UserRepositoryPort {
     });
   }
 
+  async getProfileWithUser(userId: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+      },
+    });
+    return user;
+  }
+
+  async updateProfile(userId: string, data: {
+    givenName?: string;
+    familyName?: string;
+    picture?: string;
+    avatarUrl?: string;
+    locale?: string;
+    timezone?: string;
+    birthDate?: string;
+  }): Promise<any> {
+    // Convert birthDate string to Date if provided
+    const birthDateValue = data.birthDate ? new Date(data.birthDate) : undefined;
+
+    // Upsert profile (create if not exists, update if exists)
+    return this.prisma.userProfile.upsert({
+      where: { userId },
+      create: {
+        userId,
+        givenName: data.givenName,
+        familyName: data.familyName,
+        picture: data.picture,
+        avatarUrl: data.avatarUrl,
+        locale: data.locale,
+        timezone: data.timezone,
+        birthDate: birthDateValue,
+      },
+      update: {
+        ...(data.givenName !== undefined && { givenName: data.givenName }),
+        ...(data.familyName !== undefined && { familyName: data.familyName }),
+        ...(data.picture !== undefined && { picture: data.picture }),
+        ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+        ...(data.locale !== undefined && { locale: data.locale }),
+        ...(data.timezone !== undefined && { timezone: data.timezone }),
+        ...(data.birthDate !== undefined && { birthDate: birthDateValue }),
+      },
+    });
+  }
+
   async updateStatus(userId: string, status: string): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
