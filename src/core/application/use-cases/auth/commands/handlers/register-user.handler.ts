@@ -130,6 +130,9 @@ export class RegisterUserHandler
     }
 
     // 2. Validate required fields for new users
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
     if (!phoneNumber) {
       throw new BadRequestException('Phone number is required');
     }

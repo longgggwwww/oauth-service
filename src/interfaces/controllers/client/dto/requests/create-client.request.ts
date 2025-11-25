@@ -10,7 +10,8 @@ export class CreateClientRequest {
 
   @IsArray()
   @IsUrl({ require_tld: false }, { each: true })
-  redirectUris: string[];
+  @IsOptional()
+  redirectUris?: string[];
 
   @IsOptional()
   @IsUrl({ require_tld: false })

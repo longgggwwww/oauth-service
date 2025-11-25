@@ -51,7 +51,7 @@ export class RegisterClientHandler
               .filter((gt) =>
                 Object.values(GrantType).includes(gt as GrantType),
               ) as GrantType[])
-          : [GrantType.AUTHORIZATION_CODE];
+          : [GrantType.CLIENT_CREDENTIALS];
 
       console.log('[RegisterClientHandler] Grant types:', grantTypes);
 
