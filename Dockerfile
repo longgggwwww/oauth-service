@@ -1,54 +1,42 @@
-# Build stage
+
+# Builder stage: install deps, generate Prisma client, build app
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Set dummy DATABASE_URL for build time (Prisma generate needs it but doesn't connect)
-ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV DATABASE_URL=$DATABASE_URL
-
-# Copy package files
+# Install build dependencies and copy minimal files first for caching
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
+# Install all dependencies (including dev) so we can run Prisma generate and build
 RUN npm ci
 
-# Copy source code
+# Copy rest of the source
 COPY . .
 
-# Generate Prisma Client
+# Ensure Prisma client is generated at build time
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV DATABASE_URL=$DATABASE_URL
 RUN npx prisma generate
 
-# Build application
+# Build the application (Nest.js build outputs to `dist`)
 RUN npm run build
 
-# Production stage
+# Production stage: copy built artifacts and node_modules from builder
 FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Set dummy DATABASE_URL for Prisma generate
-ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV DATABASE_URL=$DATABASE_URL
-
-# Copy package files
-COPY package*.json ./
-COPY prisma ./prisma/
-
-# Install production dependencies and Prisma Client
-RUN npm ci --omit=dev && npm install @prisma/client
-
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Copy built application from builder stage
+# Copy only what we need from builder to keep the image small
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/keys ./keys
 
-# Expose port
+# Expose default app port
 EXPOSE 3000
 
-# Start application
+# Use same start command as before
 CMD ["node", "dist/src/main.js"]
 

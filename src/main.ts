@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './infrastructure/filters/http-exception.filter';
+import { PrismaExceptionFilter } from './infrastructure/filters/prisma-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,8 +19,8 @@ async function bootstrap() {
     }),
   );
 
-  // Enable global exception filter
-  app.useGlobalFilters(new HttpExceptionFilter());
+  // Enable Prisma exception filter first so Prisma-specific errors are handled
+  app.useGlobalFilters(new PrismaExceptionFilter(), new HttpExceptionFilter());
 
   // Enable API versioning with /v1 prefix
   app.setGlobalPrefix('v1');
