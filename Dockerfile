@@ -1,42 +1,57 @@
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
 
-# Builder stage: install deps, generate Prisma client, build app
-FROM node:20-alpine AS builder
+# Use the official Node.js image with Alpine for a smaller footprint
+FROM node:20-alpine AS development
 
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Install build dependencies and copy minimal files first for caching
+# Copy application dependency manifests to the container image
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install all dependencies (including dev) so we can run Prisma generate and build
+# Install app dependencies using npm
+# 'npm ci' is preferred over 'npm install' for reproducible builds
 RUN npm ci
 
-# Copy rest of the source
-COPY . .
-
-# Ensure Prisma client is generated at build time
-ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV DATABASE_URL=$DATABASE_URL
+# Generate Prisma Client
+# This is required to have the client available for the build step
 RUN npx prisma generate
 
-# Build the application (Nest.js build outputs to `dist`)
+# Copy the rest of the source code
+COPY . .
+
+# Build the application
 RUN npm run build
 
-# Production stage: copy built artifacts and node_modules from builder
+###################
+# PRODUCTION
+###################
+
 FROM node:20-alpine AS production
 
-WORKDIR /app
+# Set the environment to production
+ENV NODE_ENV production
 
-# Copy only what we need from builder to keep the image small
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/keys ./keys
+WORKDIR /usr/src/app
 
-# Expose default app port
-EXPOSE 3000
+COPY package*.json ./
+COPY prisma ./prisma/
 
-# Use same start command as before
+# Install only production dependencies
+# This keeps the image size small
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy the built application from the development stage
+COPY --from=development /usr/src/app/dist ./dist
+
+# CRITICAL: Copy the generated Prisma Client from the development stage
+# Because we pruned devDependencies (including the Prisma CLI), we cannot run 
+# 'npx prisma generate' here. We must copy the generated files.
+COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=development /usr/src/app/node_modules/@prisma/client ./node_modules/@prisma/client
+
+# Start the server using the production build
 CMD ["node", "dist/src/main.js"]
-
