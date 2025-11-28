@@ -1,98 +1,124 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Hướng Dẫn Sử Dụng OAuth Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Dịch vụ này cung cấp API OAuth 2.0 để quản lý client, token và user. Hướng dẫn dưới đây tập trung vào các bước cơ bản: đăng ký client, lấy token từ client credentials, tạo user và đăng nhập.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**Giả định server chạy tại:** `http://localhost:3000` (thay đổi nếu cần).
 
-## Description
+## 1. Đăng Ký Client
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Tạo một client mới để sử dụng cho API calls.
 
-## Project setup
+**Request:**
 
 ```bash
-$ npm install
+curl -X POST http://localhost:3000/clients \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-test-client",
+    "description": "Client for testing API"
+  }'
 ```
 
-## Compile and run the project
+**Response (ví dụ):**
+
+```json
+{
+  "id": "client-id-here",
+  "clientId": "generated-client-id",
+  "clientSecret": "plain-secret-value",
+  "name": "my-test-client",
+  "createdAt": "2025-11-28T..."
+}
+```
+
+Lưu `clientId` và `clientSecret` (secret chỉ trả về một lần).
+
+## 2. Lấy OAuth Token (Client Credentials Grant)
+
+Sử dụng client credentials để lấy access token.
+
+**Request (dùng HTTP Basic Auth):**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl -X POST http://localhost:3000/oauth/token \
+  -u "generated-client-id:plain-secret-value" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials"
 ```
 
-## Run tests
+**Response (ví dụ):**
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "refresh-token-here",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "scope": "read write"
+}
+```
+
+Lưu `access_token` để sử dụng trong các request sau.
+
+## 3. Tạo User (User Registration)
+
+Sử dụng access token từ bước 2 để tạo user mới.
+
+**Request:**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -X POST http://localhost:3000/auth/register \
+  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "securePassword123",
+    "phoneNumber": "+84123456789",
+    "fullName": "User Name",
+    "givenName": "User",
+    "familyName": "Name"
+  }'
 ```
 
-## Deployment
+**Response:** Thành công (user được tạo, có thể cần verify email).
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 4. Đăng Nhập User (User Login)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Sau khi user tồn tại, đăng nhập để lấy token user.
+
+**Request:**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "securePassword123"
+  }'
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Response (ví dụ):**
 
-## Resources
+```json
+{
+  "accessToken": "user-access-token-here",
+  "refreshToken": "user-refresh-token-here",
+  "user": {
+    "id": "user-id",
+    "email": "user@example.com",
+    "fullName": "User Name"
+  }
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Sử dụng `accessToken` này để gọi các API yêu cầu xác thực user.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Lưu Ý
 
-## Support
+- Đảm bảo server đang chạy (`npm run start:dev`).
+- Nếu gặp lỗi, kiểm tra logs server.
+- Token có thời hạn (15 phút cho access token).
+- Để refresh token: gửi `POST /oauth/token` với `grant_type=refresh_token` và `refresh_token`.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Nếu cần thêm ví dụ hoặc script tự động, hãy cho biết!
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
