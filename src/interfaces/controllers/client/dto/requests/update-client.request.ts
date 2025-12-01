@@ -4,19 +4,23 @@ import {
   IsArray,
   IsUrl,
   IsOptional,
-  MinLength,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class UpdateClientRequest {
   @IsString()
-  @MinLength(3)
+  @IsNotEmpty()
   @IsOptional()
   name?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsArray()
   @IsUrl({ require_tld: false }, { each: true })
   @IsOptional()
-  redirectUris?: string[];
+  redirect_uris?: string[];
 
   @IsArray()
   @IsString({ each: true })
@@ -25,9 +29,9 @@ export class UpdateClientRequest {
 
   @IsUrl({ require_tld: false })
   @IsOptional()
-  websiteUrl?: string;
+  website_url?: string;
 
   @IsUrl({ require_tld: false })
   @IsOptional()
-  logoUrl?: string;
+  logo_url?: string;
 }

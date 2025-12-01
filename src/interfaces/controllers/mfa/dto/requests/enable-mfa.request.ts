@@ -7,5 +7,5 @@ export class EnableMfaRequest {
 
   @ValidateIf((o) => o.type === 'sms')
   @IsString()
-  phoneNumber?: string;
+  phone_number?: string;
 }

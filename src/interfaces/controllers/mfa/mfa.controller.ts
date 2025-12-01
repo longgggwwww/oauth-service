@@ -34,7 +34,7 @@ export class MfaController {
     const command = new EnableMfaCommand(
       req.user.id,
       request.type,
-      request.phoneNumber,
+      request.phone_number,
     );
     return this.commandBus.execute(command);
   }
@@ -70,7 +70,7 @@ export class MfaController {
   ) {
     const command = new FinishPasskeyRegistrationCommand(
       req.user.id,
-      request.attestationResponse,
+      request.attestation_response,
     );
     return this.commandBus.execute(command);
   }
@@ -83,7 +83,7 @@ export class MfaController {
 
   @Post('passkey/auth/finish')
   async finishPasskeyAuth(@Body() request: PasskeyAuthRequest) {
-    const command = new FinishPasskeyAuthCommand(request.assertionResponse);
+    const command = new FinishPasskeyAuthCommand(request.assertion_response);
     return this.commandBus.execute(command);
   }
 }

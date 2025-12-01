@@ -3,15 +3,15 @@ import { IsString, IsOptional, IsUrl, IsDateString } from 'class-validator';
 export class UpdateUserProfileRequest {
   @IsOptional()
   @IsString()
-  givenName?: string;
+  given_name?: string;
 
   @IsOptional()
   @IsString()
-  familyName?: string;
+  family_name?: string;
 
   @IsOptional()
   @IsString()
-  fullName?: string;
+  full_name?: string;
 
   @IsOptional()
   @IsUrl()
@@ -19,7 +19,7 @@ export class UpdateUserProfileRequest {
 
   @IsOptional()
   @IsUrl()
-  avatarUrl?: string;
+  avatar_url?: string;
 
   @IsOptional()
   @IsString()
@@ -31,5 +31,5 @@ export class UpdateUserProfileRequest {
 
   @IsOptional()
   @IsDateString()
-  birthDate?: string;
+  birth_date?: string;
 }

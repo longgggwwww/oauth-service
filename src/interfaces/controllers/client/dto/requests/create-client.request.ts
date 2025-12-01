@@ -1,23 +1,19 @@
-import { IsString, IsOptional, IsArray, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsUrl, IsNotEmpty } from 'class-validator';
 
 export class CreateClientRequest {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsOptional()
   @IsString()
   description?: string;
 
-  @IsArray()
-  @IsUrl({ require_tld: false }, { each: true })
   @IsOptional()
-  redirectUris?: string[];
+  @IsUrl({ require_tld: false })
+  website_url?: string;
 
   @IsOptional()
   @IsUrl({ require_tld: false })
-  websiteUrl?: string;
-
-  @IsOptional()
-  @IsUrl({ require_tld: false })
-  logoUrl?: string;
+  logo_url?: string;
 }

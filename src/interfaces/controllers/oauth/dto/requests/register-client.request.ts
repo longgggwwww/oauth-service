@@ -10,12 +10,12 @@ export class RegisterClientRequest {
 
   @IsArray()
   @IsUrl({}, { each: true })
-  redirectUris: string[];
+  redirect_uris: string[];
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  grantTypes?: string[];
+  grant_types?: string[];
 
   @IsOptional()
   @IsArray()
@@ -24,11 +24,11 @@ export class RegisterClientRequest {
 
   @IsOptional()
   @IsUrl()
-  websiteUrl?: string;
+  website_url?: string;
 
   @IsOptional()
   @IsUrl()
-  logoUrl?: string;
+  logo_url?: string;
 
   @IsOptional()
   @IsArray()

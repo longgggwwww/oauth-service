@@ -18,13 +18,25 @@ export class UpdateUserProfileHandler
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    // 2. Update profile (upsert - create if not exists)
-    await this.userRepository.updateProfile(userId, updateDto);
+    // 2. Transform snake_case DTO to camelCase for repository
+    const profileData = {
+      givenName: updateDto.given_name,
+      familyName: updateDto.family_name,
+      fullName: updateDto.full_name,
+      picture: updateDto.picture,
+      avatarUrl: updateDto.avatar_url,
+      locale: updateDto.locale,
+      timezone: updateDto.timezone,
+      birthDate: updateDto.birth_date,
+    };
 
-    // 3. Get updated user with profile
+    // 3. Update profile (upsert - create if not exists)
+    await this.userRepository.updateProfile(userId, profileData);
+
+    // 4. Get updated user with profile
     const updatedUser = await this.userRepository.getProfileWithUser(userId);
 
-    // 4. Return formatted response
+    // 5. Return formatted response
     return {
       id: updatedUser.id,
       email: updatedUser.email,

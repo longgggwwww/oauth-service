@@ -28,16 +28,16 @@ export class UserController {
     return {
       id: profile.id,
       email: profile.email,
-      phoneNumber: profile.phoneNumber,
+      phone_number: profile.phoneNumber,
       profile: {
-        givenName: profile.givenName || undefined,
-        familyName: profile.familyName || undefined,
-        fullName: profile.fullName || undefined,
+        given_name: profile.givenName || undefined,
+        family_name: profile.familyName || undefined,
+        full_name: profile.fullName || undefined,
         picture: profile.picture || undefined,
-        avatarUrl: profile.avatarUrl || undefined,
+        avatar_url: profile.avatarUrl || undefined,
         locale: profile.locale || undefined,
         timezone: profile.timezone || undefined,
-        birthDate: profile.birthDate
+        birth_date: profile.birthDate
           ? new Date(profile.birthDate).toISOString().split('T')[0]
           : undefined,
       },
@@ -60,16 +60,16 @@ export class UserController {
     return {
       id: profile.id,
       email: profile.email,
-      phoneNumber: profile.phoneNumber,
+      phone_number: profile.phoneNumber,
       profile: {
-        givenName: profile.givenName || undefined,
-        familyName: profile.familyName || undefined,
-        fullName: profile.fullName || undefined,
+        given_name: profile.givenName || undefined,
+        family_name: profile.familyName || undefined,
+        full_name: profile.fullName || undefined,
         picture: profile.picture || undefined,
-        avatarUrl: profile.avatarUrl || undefined,
+        avatar_url: profile.avatarUrl || undefined,
         locale: profile.locale || undefined,
         timezone: profile.timezone || undefined,
-        birthDate: profile.birthDate
+        birth_date: profile.birthDate
           ? new Date(profile.birthDate).toISOString().split('T')[0]
           : undefined,
       },
@@ -93,16 +93,16 @@ export class UserController {
     return {
       id: profile.id,
       email: profile.email,
-      phoneNumber: profile.phoneNumber,
+      phone_number: profile.phoneNumber,
       profile: {
-        givenName: profile.givenName || undefined,
-        familyName: profile.familyName || undefined,
-        fullName: profile.fullName || undefined,
+        given_name: profile.givenName || undefined,
+        family_name: profile.familyName || undefined,
+        full_name: profile.fullName || undefined,
         picture: profile.picture || undefined,
-        avatarUrl: profile.avatarUrl || undefined,
+        avatar_url: profile.avatarUrl || undefined,
         locale: profile.locale || undefined,
         timezone: profile.timezone || undefined,
-        birthDate: profile.birthDate
+        birth_date: profile.birthDate
           ? new Date(profile.birthDate).toISOString().split('T')[0]
           : undefined,
       },

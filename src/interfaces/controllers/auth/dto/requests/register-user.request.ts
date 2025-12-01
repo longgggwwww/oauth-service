@@ -24,21 +24,21 @@ export class RegisterUserRequest {
   @IsString()
   @IsDefined()
   @IsNotEmpty()
-  phoneNumber: string;
+  phone_number: string;
 
   // Profile fields (optional)
   @IsOptional()
   @IsString()
-  givenName?: string;
+  given_name?: string;
 
   @IsOptional()
   @IsString()
-  familyName?: string;
+  family_name?: string;
 
   @IsString()
   @IsDefined()
   @IsNotEmpty()
-  fullName: string;
+  full_name: string;
 
   @IsOptional()
   @IsUrl()
@@ -46,7 +46,7 @@ export class RegisterUserRequest {
 
   @IsOptional()
   @IsUrl()
-  avatarUrl?: string;
+  avatar_url?: string;
 
   @IsOptional()
   @IsString()
@@ -58,5 +58,5 @@ export class RegisterUserRequest {
 
   @IsOptional()
   @IsDateString()
-  birthDate?: string;
+  birth_date?: string;
 }

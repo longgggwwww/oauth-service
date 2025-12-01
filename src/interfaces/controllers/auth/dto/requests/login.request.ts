@@ -8,13 +8,13 @@ export class LoginRequest {
   password: string;
 
   @IsString()
-  clientId: string;
+  client_id: string;
 
   @IsOptional()
   @IsString()
-  clientSecret?: string;
+  client_secret?: string;
 
   @IsOptional()
   @IsString()
-  mfaToken?: string;
+  mfa_token?: string;
 }

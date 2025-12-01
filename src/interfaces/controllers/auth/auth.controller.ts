@@ -42,16 +42,16 @@ export class AuthController {
   async register(@Body() request: RegisterUserRequest) {
     const command = new RegisterUserCommand(
       request.email,
-      request.phoneNumber,
-      request.fullName,
+      request.phone_number,
+      request.full_name,
       request.password,
-      request.givenName,
-      request.familyName,
+      request.given_name,
+      request.family_name,
       request.picture,
-      request.avatarUrl,
+      request.avatar_url,
       request.locale,
       request.timezone,
-      request.birthDate,
+      request.birth_date,
     );
     return this.commandBus.execute(command);
   }
@@ -62,9 +62,9 @@ export class AuthController {
     const command = new AuthenticateCommand(
       request.email,
       request.password,
-      request.clientId,
-      request.clientSecret,
-      request.mfaToken,
+      request.client_id,
+      request.client_secret,
+      request.mfa_token,
     );
     return this.commandBus.execute(command);
   }

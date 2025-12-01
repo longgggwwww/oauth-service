@@ -3,26 +3,26 @@ import { ClientSummary } from '@src/core/shared/types';
 
 export class ClientSummaryResponse {
   id: string;
-  clientId: string;
+  client_id: string;
   name: string;
-  redirectUris: string[];
+  redirect_uris: string[];
   scope?: string[];
-  websiteUrl?: string;
-  logoUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  website_url?: string;
+  logo_url?: string;
+  created_at: Date;
+  updated_at: Date;
 
   static fromSummary(summary: ClientSummary): ClientSummaryResponse {
     const response = new ClientSummaryResponse();
     response.id = summary.id;
-    response.clientId = summary.clientId;
+    response.client_id = summary.clientId;
     response.name = summary.name;
-    response.redirectUris = summary.redirectUris;
+    response.redirect_uris = summary.redirectUris;
     response.scope = summary.scope;
-    response.websiteUrl = summary.websiteUrl;
-    response.logoUrl = summary.logoUrl;
-    response.createdAt = summary.createdAt;
-    response.updatedAt = summary.updatedAt;
+    response.website_url = summary.websiteUrl;
+    response.logo_url = summary.logoUrl;
+    response.created_at = summary.createdAt;
+    response.updated_at = summary.updatedAt;
     return response;
   }
 }

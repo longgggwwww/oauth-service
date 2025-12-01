@@ -8,6 +8,7 @@ import { OauthModule } from '../oauth/oauth.module';
 import { ClientController } from './client.controller';
 import { GetUserClientsHandler } from '@src/core/application/use-cases/client/queries/handlers/get-user-clients.handler';
 import { GetClientHandler } from '@src/core/application/use-cases/client/queries/handlers/get-client.handler';
+import { GetClientByClientIdHandler } from '@src/core/application/use-cases/client/queries/handlers/get-client-by-client-id.handler';
 import { UpdateClientHandler } from '@src/core/application/use-cases/client/commands/handlers/update-client.handler';
 import { DeleteClientHandler } from '@src/core/application/use-cases/client/commands/handlers/delete-client.handler';
 import { RegisterClientHandler } from '@src/core/application/use-cases/client/commands/handlers/register-client.handler';
@@ -20,6 +21,7 @@ import { CachedTokenRepository } from '@src/infrastructure/persistence/redis/rep
   providers: [
     GetUserClientsHandler,
     GetClientHandler,
+    GetClientByClientIdHandler,
     UpdateClientHandler,
     DeleteClientHandler,
     RegisterClientHandler,

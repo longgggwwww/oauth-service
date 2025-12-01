@@ -26,8 +26,8 @@ export class UpdateClientHandler
     if (command.updateDto.name !== undefined) {
       client.appName = command.updateDto.name;
     }
-    if (command.updateDto.redirectUris !== undefined) {
-      client.redirectUris = command.updateDto.redirectUris;
+    if (command.updateDto.redirect_uris !== undefined) {
+      client.redirectUris = command.updateDto.redirect_uris;
     }
 
     client.updatedAt = new Date();

@@ -2,7 +2,7 @@
 import {
   Controller,
   Get,
-  Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -13,6 +13,7 @@ import {
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { GetUserClientsQuery } from '@src/core/application/use-cases/client/queries/get-user-clients.query';
 import { GetClientQuery } from '@src/core/application/use-cases/client/queries/get-client.query';
+import { GetClientByClientIdQuery } from '@src/core/application/use-cases/client/queries/get-client-by-client-id.query';
 import { UpdateClientCommand } from '@src/core/application/use-cases/client/commands/update-client.command';
 import { DeleteClientCommand } from '@src/core/application/use-cases/client/commands/delete-client.command';
 import { ClientListResponse } from './dto/responses/client-list.response';
@@ -48,14 +49,7 @@ export class ClientController {
 
     const { client, plainSecret } = await this.commandBus.execute(command);
 
-    return {
-      id: client.id,
-      clientId: client.clientId,
-      clientSecret: plainSecret,
-      name: client.appName,
-      redirectUris: client.redirectUris,
-      createdAt: client.createdAt,
-    };
+    return ClientRegistrationResponse.fromEntity(client, plainSecret);
   }
 
   @Get()
@@ -66,6 +60,16 @@ export class ClientController {
     return ClientListResponse.fromClients(clients);
   }
 
+  @Get('by-client-id/:clientId')
+  async getClientByClientId(
+    @Param('clientId') clientId: string,
+  ): Promise<ClientDetailsResponse> {
+    const query = new GetClientByClientIdQuery(clientId);
+    const client = await this.queryBus.execute(query);
+
+    return ClientDetailsResponse.fromEntity(client);
+  }
+
   @Get(':id')
   async getClient(@Param('id') id: string): Promise<ClientDetailsResponse> {
     const query = new GetClientQuery(id);
@@ -74,7 +78,7 @@ export class ClientController {
     return ClientDetailsResponse.fromEntity(client);
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateClient(
     @Param('id') id: string,
     @Body() updateDto: UpdateClientRequest,
