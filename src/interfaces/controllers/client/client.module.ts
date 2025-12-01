@@ -12,6 +12,7 @@ import { GetClientByClientIdHandler } from '@src/core/application/use-cases/clie
 import { UpdateClientHandler } from '@src/core/application/use-cases/client/commands/handlers/update-client.handler';
 import { DeleteClientHandler } from '@src/core/application/use-cases/client/commands/handlers/delete-client.handler';
 import { RegisterClientHandler } from '@src/core/application/use-cases/client/commands/handlers/register-client.handler';
+import { RegenerateClientSecretHandler } from '@src/core/application/use-cases/client/commands/handlers/regenerate-client-secret.handler';
 import { ClientRepository } from '@src/infrastructure/persistence/prisma/repositories/client.repository';
 import { CachedTokenRepository } from '@src/infrastructure/persistence/redis/repositories/cached-token.repository';
 
@@ -25,6 +26,7 @@ import { CachedTokenRepository } from '@src/infrastructure/persistence/redis/rep
     UpdateClientHandler,
     DeleteClientHandler,
     RegisterClientHandler,
+    RegenerateClientSecretHandler,
     {
       provide: 'ClientRepositoryPort',
       useClass: ClientRepository,

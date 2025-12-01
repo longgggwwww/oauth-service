@@ -22,7 +22,9 @@ import { UpdateClientRequest } from './dto/requests/update-client.request';
 
 import { CreateClientRequest } from './dto/requests/create-client.request';
 import { ClientRegistrationResponse } from './dto/responses/client-registration.response';
+import { ClientSecretResponse } from './dto/responses/client-secret.response';
 import { RegisterClientCommand } from '@src/core/application/use-cases/client/commands/register-client.command';
+import { RegenerateClientSecretCommand } from '@src/core/application/use-cases/client/commands/regenerate-client-secret.command';
 
 @Controller('clients')
 export class ClientController {
@@ -94,5 +96,15 @@ export class ClientController {
   async deleteClient(@Param('id') id: string): Promise<void> {
     const command = new DeleteClientCommand(id);
     await this.commandBus.execute(command);
+  }
+
+  @Post(':id/regenerate-secret')
+  async regenerateClientSecret(
+    @Param('id') id: string,
+  ): Promise<ClientSecretResponse> {
+    const command = new RegenerateClientSecretCommand(id);
+    const { client, plainSecret } = await this.commandBus.execute(command);
+
+    return ClientSecretResponse.fromEntity(client, plainSecret);
   }
 }

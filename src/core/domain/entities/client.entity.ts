@@ -92,4 +92,9 @@ export class ClientAppEntity {
   supportsGrantType(grantType: GrantType): boolean {
     return this.allowedGrantTypes.includes(grantType);
   }
+
+  updateSecret(hashedSecret: string): void {
+    this.clientSecret = hashedSecret;
+    this.updatedAt = new Date();
+  }
 }

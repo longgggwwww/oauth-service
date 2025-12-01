@@ -1,12 +1,13 @@
 import { IsString, IsNotEmpty, IsOptional, IsIn } from 'class-validator';
 
 export class TokenRequest {
+  @IsOptional()
   @IsString()
   @IsIn(['authorization_code', 'refresh_token', 'client_credentials'], {
     message:
       'grant_type must be one of: authorization_code, refresh_token, client_credentials',
   })
-  grant_type: string;
+  grant_type?: string;
 
   @IsOptional()
   @IsString()

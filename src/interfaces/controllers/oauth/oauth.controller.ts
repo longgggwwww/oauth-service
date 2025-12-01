@@ -74,6 +74,10 @@ export class OauthController {
         }
       }
     }
+    // If grant_type isn't provided, default to client_credentials
+    if (!request.grant_type) {
+      request.grant_type = 'client_credentials';
+    }
 
     const command = new ExchangeTokenCommand(request);
     return this.commandBus.execute(command);
