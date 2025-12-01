@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  GoneException,
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { VerifyEmailCommand } from '../verify-email.command';
@@ -28,7 +29,9 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
       await this.emailVerificationTokenRepository.findByToken(token);
 
     if (!verificationToken) {
-      throw new NotFoundException('Invalid or expired verification token');
+      // Token not found - could be already used or invalid
+      // Return a special response indicating token was already used or invalid
+      throw new GoneException('This verification link has already been used or is invalid. Your email may already be verified.');
     }
 
     console.log(

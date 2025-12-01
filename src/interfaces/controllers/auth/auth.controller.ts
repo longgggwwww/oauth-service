@@ -7,8 +7,10 @@ import {
   HttpCode,
   UseGuards,
   Req,
+  Res,
   BadRequestException,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserRequest } from './dto/requests/register-user.request';
 import { LoginRequest } from './dto/requests/login.request';
@@ -68,9 +70,22 @@ export class AuthController {
   }
 
   @Get('verify-email')
-  async verifyEmail(@Query() request: VerifyEmailRequest) {
-    const command = new VerifyEmailCommand(request.token);
-    return this.commandBus.execute(command);
+  async verifyEmail(@Query() request: VerifyEmailRequest, @Res() res: Response) {
+    try {
+      const command = new VerifyEmailCommand(request.token);
+      await this.commandBus.execute(command);
+      
+      res.setHeader('Content-Type', 'text/plain');
+      return res.send('Email verified successfully');
+    } catch (error) {
+      if (error.status === 410) {
+        res.setHeader('Content-Type', 'text/plain');
+        return res.status(200).send('Email already verified');
+      }
+      
+      res.setHeader('Content-Type', 'text/plain');
+      return res.status(error.status || 400).send(`Verification failed: ${error.message || 'Unknown error'}`);
+    }
   }
 
   @Post('resend-verification')

@@ -80,10 +80,18 @@ export class OauthController {
   }
 
   @Post('revoke')
-  @HttpCode(200)
-  async revoke(@Body() request: RevokeTokenRequest) {
+  async revoke(@Body() request: RevokeTokenRequest, @Res() res) {
     const command = new RevokeTokenCommand(request);
-    await this.commandBus.execute(command);
+    const revoked = await this.commandBus.execute(command);
+
+    // If something was actually revoked, return 204 No Content.
+    if (revoked) {
+      return res.status(204).send();
+    }
+
+    // RFC 7009: If the token was invalid/unknown, still return success (200).
+    // Provide a small JSON response so clients can detect success on 200.
+    return res.status(200).json({ success: true, message: 'token revoked or invalid' });
   }
 
   @Get('userinfo')

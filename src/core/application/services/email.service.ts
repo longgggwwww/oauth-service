@@ -24,11 +24,11 @@ export class EmailService {
     token: string,
     username?: string,
   ): Promise<void> {
-    const backendUrl = this.configService.get(
-      'BACKEND_URL',
+    const frontendUrl = this.configService.get(
+      'FRONTEND_URL',
       'http://localhost:3000',
     );
-    const verificationUrl = `${backendUrl}/v1/auth/verify-email?token=${token}`;
+    const verificationUrl = `${frontendUrl}/v1/auth/verify-email?token=${token}`;
 
     const emailFrom = this.configService.get(
       'EMAIL_FROM',

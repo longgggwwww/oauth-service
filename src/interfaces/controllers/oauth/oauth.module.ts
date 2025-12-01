@@ -5,6 +5,7 @@ import { PrismaModule } from '@src/infrastructure/persistence/prisma/prisma.modu
 import { OauthController } from './oauth.controller';
 import { ExchangeTokenHandler } from '@src/core/application/use-cases/oauth/commands/handlers/exchange-token.handler';
 import { AuthorizeHandler } from '@src/core/application/use-cases/oauth/commands/handlers/authorize.handler';
+import { RevokeTokenHandler } from '@src/core/application/use-cases/oauth/commands/handlers/revoke-token.handler';
 import { ClientRepository } from '@src/infrastructure/persistence/prisma/repositories/client.repository';
 import { RefreshTokenRepository } from '@src/infrastructure/persistence/prisma/repositories/refresh-token.repository';
 import { AuthorizationCodeRepository } from '@src/infrastructure/persistence/prisma/repositories/authorization-code.repository';
@@ -27,6 +28,7 @@ import { JwtAuthGuard } from '@src/infrastructure/common/guards/jwt-auth.guard';
   providers: [
     ExchangeTokenHandler,
     AuthorizeHandler,
+    RevokeTokenHandler,
     ClientRepository,
     RefreshTokenRepository,
     AuthorizationCodeRepository,

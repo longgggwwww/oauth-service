@@ -61,4 +61,18 @@ export class RefreshTokenRepository {
       data: { revoked: true },
     });
   }
+
+  async revokeByUserAndClient(userId: string, clientId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, clientId },
+      data: { revoked: true },
+    });
+  }
+
+  async deleteExpired(): Promise<number> {
+    const result = await this.prisma.refreshToken.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
+    return result.count;
+  }
 }
