@@ -7,4 +7,5 @@ export interface ClientRepositoryPort {
   findByOwnerId(ownerId: string): Promise<ClientAppEntity[]>;
   save(client: ClientAppEntity): Promise<ClientAppEntity>;
   delete(id: string): Promise<void>;
+  deleteMany(ids: string[]): Promise<void>;
 }

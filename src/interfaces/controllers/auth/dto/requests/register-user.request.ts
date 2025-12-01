@@ -21,10 +21,9 @@ export class RegisterUserRequest {
   @IsNotEmpty()
   password: string;
 
+  @IsOptional()
   @IsString()
-  @IsDefined()
-  @IsNotEmpty()
-  phone_number: string;
+  phone_number?: string;
 
   // Profile fields (optional)
   @IsOptional()

@@ -133,9 +133,6 @@ export class RegisterUserHandler
     if (!email) {
       throw new BadRequestException('Email is required');
     }
-    if (!phoneNumber) {
-      throw new BadRequestException('Phone number is required');
-    }
     if (!fullName) {
       throw new BadRequestException('Full name is required');
     }

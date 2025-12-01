@@ -11,6 +11,7 @@ import { GetClientHandler } from '@src/core/application/use-cases/client/queries
 import { GetClientByClientIdHandler } from '@src/core/application/use-cases/client/queries/handlers/get-client-by-client-id.handler';
 import { UpdateClientHandler } from '@src/core/application/use-cases/client/commands/handlers/update-client.handler';
 import { DeleteClientHandler } from '@src/core/application/use-cases/client/commands/handlers/delete-client.handler';
+import { DeleteManyClientsHandler } from '@src/core/application/use-cases/client/commands/handlers/delete-many-clients.handler';
 import { RegisterClientHandler } from '@src/core/application/use-cases/client/commands/handlers/register-client.handler';
 import { RegenerateClientSecretHandler } from '@src/core/application/use-cases/client/commands/handlers/regenerate-client-secret.handler';
 import { ClientRepository } from '@src/infrastructure/persistence/prisma/repositories/client.repository';
@@ -25,6 +26,7 @@ import { CachedTokenRepository } from '@src/infrastructure/persistence/redis/rep
     GetClientByClientIdHandler,
     UpdateClientHandler,
     DeleteClientHandler,
+    DeleteManyClientsHandler,
     RegisterClientHandler,
     RegenerateClientSecretHandler,
     {

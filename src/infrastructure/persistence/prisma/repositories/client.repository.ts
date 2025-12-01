@@ -150,6 +150,12 @@ export class ClientRepository implements ClientRepositoryPort {
     });
   }
 
+  async deleteMany(ids: string[]): Promise<void> {
+    await this.prisma.clientApp.deleteMany({
+      where: { id: { in: ids } },
+    });
+  }
+
   async findServiceAccounts(): Promise<ClientAppEntity[]> {
     const clients = await this.prisma.clientApp.findMany({
       where: { role: ClientRole.SERVICE_ACCOUNT },

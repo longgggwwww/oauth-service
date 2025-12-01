@@ -21,10 +21,12 @@ import { ClientDetailsResponse } from './dto/responses/client-details.response';
 import { UpdateClientRequest } from './dto/requests/update-client.request';
 
 import { CreateClientRequest } from './dto/requests/create-client.request';
+import { DeleteManyClientsRequest } from './dto/requests/delete-many-clients.request';
 import { ClientRegistrationResponse } from './dto/responses/client-registration.response';
 import { ClientSecretResponse } from './dto/responses/client-secret.response';
 import { RegisterClientCommand } from '@src/core/application/use-cases/client/commands/register-client.command';
 import { RegenerateClientSecretCommand } from '@src/core/application/use-cases/client/commands/regenerate-client-secret.command';
+import { DeleteManyClientsCommand } from '@src/core/application/use-cases/client/commands/delete-many-clients.command';
 
 @Controller('clients')
 export class ClientController {
@@ -89,6 +91,15 @@ export class ClientController {
     const client = await this.commandBus.execute(command);
 
     return ClientDetailsResponse.fromEntity(client);
+  }
+
+  @Delete('batch')
+  @HttpCode(200)
+  async deleteManyClients(
+    @Body() request: DeleteManyClientsRequest,
+  ): Promise<{ deletedCount: number }> {
+    const command = new DeleteManyClientsCommand(request.ids);
+    return this.commandBus.execute(command);
   }
 
   @Delete(':id')

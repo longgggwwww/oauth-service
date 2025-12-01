@@ -47,23 +47,6 @@ describe('RegisterUserHandler - required fields validation', () => {
     );
   });
 
-  it('should throw BadRequestException when phoneNumber is missing', async () => {
-    const command = new RegisterUserCommand(
-      'test@example.com',
-      undefined as any, // phoneNumber missing
-      'John Doe',
-      'password123',
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-    );
-    await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
-  });
-
   it('should throw BadRequestException when fullName is missing', async () => {
     const command = new RegisterUserCommand(
       'test@example.com',
